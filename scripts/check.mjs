@@ -275,7 +275,6 @@ for (const file of essays) {
   const at = `content/posts/${file}`;
 
   if (!fm.title) errors.push(`${at}: front matter has no "title"`);
-  if (fm.draft === 'true') { warnings.push(`${at}: marked draft, so it will not be published`); continue; }
 
   const seed = Number(fm.seed);
   if (Number.isFinite(seed)) {
@@ -294,6 +293,12 @@ for (const file of essays) {
     if (!Number.isFinite(g) || g < 0 || g > 1) {
       errors.push(`${at}: growth must be between 0 and 1, got "${fm.growth}"`);
     }
+  }
+
+  // Checked last: a draft still gets seed and growth validation, so scaffolding a
+  // post tells you about a colliding seed straight away rather than on publish.
+  if (fm.draft === 'true') {
+    warnings.push(`${at}: marked draft, so it will not be published`);
   }
 }
 
