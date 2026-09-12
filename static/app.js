@@ -47,6 +47,7 @@
     mid: 'var(--plate-2)',
     shade: 'var(--plate-3)',
     deep: 'var(--plate-4)',
+    ground: 'var(--plate-ground)',
   };
 
   function plateSVG(seed) {
@@ -61,18 +62,13 @@
     });
 
     const defs = el('defs');
-    const sky = el('linearGradient', { id: `${uid}-sky`, x1: '0', y1: '0', x2: '0.4', y2: '1' });
-    sky.append(
-      el('stop', { offset: '0%', 'stop-color': V.sky }),
-      el('stop', { offset: '100%', 'stop-color': V.mid }),
-    );
     const fade = el('linearGradient', { id: `${uid}-fade`, x1: '0', y1: '0', x2: '0', y2: '1' });
     fade.append(
       el('stop', { offset: '0%', 'stop-color': 'rgba(0,0,0,0)' }),
       el('stop', { offset: '60%', 'stop-color': 'rgba(0,0,0,0)' }),
       el('stop', { offset: '100%', 'stop-color': 'rgba(0,0,0,0.45)' }),
     );
-    defs.append(sky, fade);
+    defs.append(fade);
     svg.append(defs);
 
     const add = (tag, attrs) => { const n = el(tag, attrs); svg.append(n); return n; };
@@ -81,15 +77,15 @@
       add('rect', { x: x + w * 0.72, y, width: w * 0.28, height: h, fill: V.shade });
     };
 
-    add('rect', { x: 0, y: 0, width: 400, height: 500, fill: `url(#${uid}-sky)` });
+    add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
 
     switch (seed % 6) {
       /* 0 — deep horizontal reveal with one standing pier */
       case 0: {
         const y = R.range(120, 175);
-        add('rect', { x: 0, y: 0, width: 400, height: y, fill: V.sky, opacity: 0.6 });
+        add('rect', { x: 0, y: 0, width: 400, height: y, fill: V.ground });
         add('rect', { x: 0, y: y - 26, width: 400, height: 26, fill: V.deep });
-        add('rect', { x: 0, y, width: 400, height: 500 - y, fill: V.mid });
+        add('rect', { x: 0, y, width: 400, height: 500 - y, fill: V.ground });
         add('rect', { x: 0, y, width: 400, height: R.range(16, 26), fill: V.deep, opacity: 0.85 });
         face(R.range(120, 230), y - R.range(90, 150), R.range(34, 50), R.range(130, 190));
         for (let i = 0; i < 3; i++) {
@@ -101,7 +97,7 @@
       /* 1 — colonnade, receding */
       case 1: {
         const n = R.int(4, 6), w = 400 / n;
-        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.deep });
+        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
         for (let i = 0; i < n; i++) {
           const inset = (n - i) * R.range(2, 7);
           face(i * w + inset * 0.5, 40 + inset, w - inset - 6, 420 - inset * 2);
@@ -113,7 +109,7 @@
 
       /* 2 — dark mass, a few openings still catching light */
       case 2: {
-        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.deep });
+        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
         add('rect', { x: R.range(30, 70), y: 0, width: R.range(250, 320), height: 500, fill: V.shade });
         const cols = R.int(2, 3), rows = R.int(3, 4);
         for (let c = 0; c < cols; c++) {
@@ -133,7 +129,7 @@
 
       /* 3 — stair, cut by one hard shadow */
       case 3: {
-        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.mid });
+        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
         add('rect', { x: 0, y: 0, width: 400, height: R.range(150, 210), fill: V.sky, opacity: 0.42 });
         const steps = R.int(9, 13), rise = 300 / steps;
         for (let i = 0; i < steps; i++) {
@@ -146,7 +142,7 @@
 
       /* 4 — strict window grid, light only on the top rows */
       case 4: {
-        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.shade });
+        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
         const cols = R.int(3, 4), rows = 6, cw = 400 / cols, rh = 500 / rows;
         for (let c = 0; c < cols; c++) {
           for (let r = 0; r < rows; r++) {
@@ -165,7 +161,7 @@
 
       /* 5 — collapsed slabs, sky through the gap */
       case 5: {
-        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.mid, opacity: 0.75 });
+        add('rect', { x: 0, y: 0, width: 400, height: 500, fill: V.ground });
         add('rect', { x: 0, y: 0, width: 400, height: 190, fill: V.sky, opacity: 0.7 });
         add('g', { transform: `rotate(${R.range(-13, -4).toFixed(2)} 200 330)` });
         add('rect', { x: -40, y: 250, width: 260, height: R.range(90, 130), fill: V.mid });

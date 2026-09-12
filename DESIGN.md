@@ -65,21 +65,25 @@ Volume was never the problem. Placement was.
 
 ## Moss
 
-**What it is.** One generated sprig mark, and a creep line along the bottom edge of each
+**What it is.** One generated sprig mark, and a moss fringe along the bottom edge of each
 slab. Nothing else.
 
 **Where it goes**
 
 | Place | Treatment |
 | --- | --- |
-| Bottom edge of a frame, link card, or essay entry | A thin creep line inside the slab's own bottom padding |
+| Bottom edge of a frame, link card, or essay entry | A moss fringe inside the slab's own bottom padding |
 | Beside a section heading, and in the footer | The sprig mark, small, in moss green |
 | Bottom-right of an essay plate | One sprig |
 
 **How it is built.** `styles.css`, the "Moss, integrated" block. Each slab is
 `position: relative; overflow: hidden`, and gets a `::after` strip anchored to its bottom
-edge. `--creep` varies per slab so no two joints look alike. The value comes from
-`creepFor(i)` in `app.js` — deterministic, so the page is identical on every load.
+edge: a thin base band plus overlapping radial-gradient clumps, so the top edge is bumpy and
+reads as growth rather than a glow. The clump field is tiled at two co-prime widths so no
+repetition is visible, and two per-slab variables break uniformity: `--creep` (height) and
+`--moss-x` (horizontal tile phase, derived from `--creep`). Both trace back to `creepFor(i)`
+in `app.js` — deterministic, so the page is identical on every load. The first
+implementation was a smooth gradient; it read as a bevel, not moss, and was replaced.
 
 **Never.** A `position: fixed` moss layer. A moss shape large enough to sit under text.
 Anything that requires the content to move out of the way.
@@ -143,7 +147,8 @@ archetype is `seed % 6`:
 The same seed always draws the same plate. Every essay needs its own seed or two essays
 show the same image; `check.mjs` warns when they collide.
 
-**Colour.** Plates read `--plate-0` … `--plate-4`, so they follow the theme. They stay
+**Colour.** Plates read `--plate-0` … `--plate-4` for their faces, and `--plate-ground` for
+the ground they sit on, so they follow the theme. They stay
 neutral grey in both themes, so they read against the green field in Moonlit.
 
 ---

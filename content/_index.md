@@ -19,13 +19,3 @@ Other than that, I hope that you have a little bit of fun and possibly read some
 I can also be found on Bluesky, Mastodon, and Threads. Sometimes.
 
 [Contact me here!](https://letterbird.co/talktovictor)
-
-## Links to Cool Stuff
-
-I will also take this space here to advertise some cool stuff that my friends do.
-
-[INSIG](https://weareinsig.com)
-
-## Appearances in the Wild
-
-This is where places where my tracks have been found or I have been spotted go.

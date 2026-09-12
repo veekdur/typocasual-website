@@ -8,6 +8,10 @@
       {{- else }}Essays{{ end -}}
     </span>
 
+    {{- if or .IsHome .IsPage }}
+      <a class="rail__cell rail__cell--link" href="/posts/">Essays</a>
+    {{- end }}
+
     {{- if not .IsHome }}
       <a class="rail__cell rail__cell--link" href="/">Front page</a>
     {{- end }}

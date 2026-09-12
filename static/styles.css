@@ -57,6 +57,7 @@
   --plate-2: #514f48;
   --plate-3: #302f2b;
   --plate-4: #1a1917;
+  --plate-ground: #0d1a12;
 
   --grain-op: 0.34;
   --grain-blend: overlay;
@@ -89,6 +90,7 @@
   --plate-2: #a9a59a;
   --plate-3: #6f6c63;
   --plate-4: #38372f;
+  --plate-ground: #e5e2da;
 
   --grain-op: 0.28;
   --grain-blend: multiply;
@@ -591,7 +593,10 @@ a:hover { color: var(--moss); }
    Moss grows in the joints. It clings to the bottom edge of a slab, inside
    that slab's own padding, and it is clipped by the slab — so it can never
    cross text or imagery. It is part of the surface, not a layer above it.
-   `--creep` varies per slab so no two look alike. */
+   The edge is a thin base band plus overlapping clumps, drawn with radial
+   gradients tiled at co-prime widths so the join does not read as a repeat.
+   `--creep` sets the height; `--moss-x` shifts the tile phase, so no two
+   joints look alike. Colour comes only from the moss tokens. */
 
 .frame,
 .linkcard,
@@ -599,26 +604,55 @@ a:hover { color: var(--moss); }
 .essay__aside {
   position: relative;
   overflow: hidden;
+  --moss-x: calc(var(--creep, 0.4) * 34px);
 }
 
 .frame::after,
 .linkcard::after,
-.entry::after {
+.entry::after,
+.essay__aside::after {
   content: "";
   position: absolute;
-  left: -3%;
-  right: -3%;
-  bottom: -3px;
-  height: calc(3px + var(--creep, 0) * 9px);
-  background: linear-gradient(
-    to top,
-    var(--moss-soft),
-    color-mix(in srgb, var(--moss) 55%, transparent)
-  );
-  border-radius: 54% 46% 0 0 / 92% 84% 0 0;
+  left: -8px;
+  right: -8px;
+  bottom: 0;
+  height: calc(5px + var(--creep, 0.4) * 6px);
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle calc(3px + var(--creep, 0.4) * 4.2px)   at 24% 100%, var(--moss) 92%, transparent 100%),
+    radial-gradient(circle calc(2.4px + var(--creep, 0.4) * 3.4px) at 68% 100%, var(--moss) 92%, transparent 100%),
+    radial-gradient(circle calc(2.6px + var(--creep, 0.4) * 3px)   at 43% 100%, var(--moss) 92%, transparent 100%),
+    radial-gradient(circle calc(2.2px + var(--creep, 0.4) * 3.6px) at 84% 100%, var(--moss) 92%, transparent 100%),
+    radial-gradient(circle calc(3.2px + var(--creep, 0.4) * 2.4px) at 12% 100%, var(--moss) 92%, transparent 100%),
+    linear-gradient(to top, var(--moss-soft) 0 2px, transparent 2px);
+  background-size: 67px 100%, 79px 100%, 89px 100%, 101px 100%, 113px 100%, 100% 100%;
+  background-position:
+    var(--moss-x) 100%,
+    calc(var(--moss-x) * -1.7 - 29px) 100%,
+    calc(var(--moss-x) * 2.1 + 13px) 100%,
+    calc(var(--moss-x) * -0.9 + 51px) 100%,
+    calc(var(--moss-x) * 1.4 - 8px) 100%,
+    0 100%;
+  background-repeat: repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, no-repeat;
   opacity: 0.55;
   pointer-events: none;
 }
+
+/* One horizontal phase per slab, so two joints in a grid never line up. */
+.frame:nth-child(3n+1) { --moss-x: calc(var(--creep, 0.4) * 34px + 4px); }
+.frame:nth-child(3n+2) { --moss-x: calc(var(--creep, 0.4) * 34px + 21px); }
+.frame:nth-child(3n)   { --moss-x: calc(var(--creep, 0.4) * 34px + 38px); }
+
+.linkcard:nth-child(3n+1) { --moss-x: calc(var(--creep, 0.4) * 34px - 7px); }
+.linkcard:nth-child(3n+2) { --moss-x: calc(var(--creep, 0.4) * 34px + 16px); }
+.linkcard:nth-child(3n)   { --moss-x: calc(var(--creep, 0.4) * 34px + 30px); }
+
+/* Entries carry no `--creep` from app.js, so set one per position. */
+.entry:nth-child(5n+1) { --creep: 0.86; }
+.entry:nth-child(5n+2) { --creep: 0.31; }
+.entry:nth-child(5n+3) { --creep: 0.62; }
+.entry:nth-child(5n+4) { --creep: 0.14; }
+.entry:nth-child(5n+5) { --creep: 0.47; }
 
 /* A single tuft in the corner of the essay plate, where a joint would be. */
 .essay__aside .sprig {
@@ -688,6 +722,7 @@ a:hover { color: var(--moss); }
   position: relative;
   background: var(--slab-0);
   border-bottom: var(--seam) solid var(--rule);
+  padding-bottom: 14px;
 }
 
 @media (min-width: 940px) {

@@ -120,8 +120,30 @@ rewritten for the new frame shape.
 
 ---
 
+## 2026-09-12 — Review pass: navigation, intro, plates, moss
+
+**Delegated.** Both tasks were coded by `deepseek/deepseek-v4.1-flash` through Command Code,
+brokered by `agentctl` (two runs, audited under `~/.agentctl/runs/`). Reviewed and verified
+visually by the parent — first time the site has been reviewed with actual vision, using
+headless-Chromium renders in both themes.
+
+| Finding | Fix |
+| --- | --- |
+| `/posts/` was unreachable from the front page — the rail label was a `<span>` | An "Essays" link now renders on the home and essay pages |
+| Vault scaffolding was live: "Links to Cool Stuff" (with the INSIG link) and "Appearances in the Wild", a heading whose body admitted it had no content | Removed. The intro now ends at "Contact me here!" |
+| "Essays" printed twice on `/posts/` (kicker + H1) | Kicker removed |
+| Essay plates sat on a near-black ground in Sunlit | The plates' sky gradient was replaced with a `--plate-ground` token — `#0d1a12` in Moonlit, `#e5e2da` in Sunlit — so plates now sit directly on the page field |
+| The moss read as a bevel, not moss: technically in the joint, but a smooth glow with no character | Rebuilt as a fringe: a thin base band plus overlapping radial-gradient clumps, tiled at co-prime widths, phased per slab (`--moss-x` from `--creep`) |
+
+**Process note.** The moss finding only surfaced because the redesign was finally *looked at*.
+Every check before this one was structural. The lesson is recorded in `AGENTS.md`:
+`check.mjs` can verify moss is clipped to its slab, but only eyes can verify it reads as moss.
+
+---
+
 ## Unresolved
 
 - The three placeholder essays still sit among the real ones.
 - The `CLOUDFLARE_API_TOKEN` secret is unset, so pushes do not deploy.
-- The generated plates have never been reviewed by eye.
+- The moss clumps are small and dense; a chunkier read is possible if the fringe ever feels
+too subtle.

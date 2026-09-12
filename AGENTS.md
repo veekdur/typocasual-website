@@ -196,5 +196,12 @@ Reading is 17px at line-height 1.7, in a column under 68 characters.
    - the theme toggle flips both appearances without unreadable text
    - **no green shape covers any text** at any width
 3. Check a narrow window (~390px) for horizontal overflow.
-4. Append an entry to `LEDGER.md` if the change was substantial.
-5. Commit and push. CI validates, builds, and deploys.
+4. **Look at it.** `check.mjs` proves structure, not appearance — the moss once passed every
+   structural check while reading as a bevel instead of moss. Render the page
+   (headless Chromium works:
+   `~/Library/Caches/ms-playwright/chromium_headless_shell-*/…/chrome-headless-shell --headless --screenshot=…`)
+   and judge with eyes, in **both** themes. To capture Moonlit, patch the built `public/app.js`
+   to force `setTheme('dark', false)` — headless Chrome emulates a light-mode visitor — and
+   restore or rebuild afterwards.
+5. Append an entry to `LEDGER.md` if the change was substantial.
+6. Commit and push. CI validates, builds, and deploys.
