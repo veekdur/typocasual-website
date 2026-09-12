@@ -1,407 +1,326 @@
-# typocasual — how to run this thing
+# typocasual — owner manual
 
-Your site lives at `~/Projects/typocasual-hugo`. It is a git repo, and pushing to GitHub
-publishes it. This file is the owner's manual: how to write a post, how to edit the front
-page, what the files are, and what not to touch.
+This manual tells you how to add a post, change the front page, and publish the site.
+Read section 3 first. Read section 10 before you change a file.
 
-If you only read one section, read **The two-minute version** and **The five rules**.
+## 1. Purpose
 
----
+The site has two parts.
 
-## The two-minute version
+- The front page shows the contact sheet. The contact sheet is a grid of frames.
+- The essay pages show long text. Each essay is one Markdown file.
 
-```bash
-cd ~/Projects/typocasual-hugo
+Hugo builds the site. Cloudflare supplies the site to the public.
 
-npm run new -- posts/my-new-post.md   # 1. make a post
-# ...edit the file it just made...
-                                        # 2. delete the line `draft: true`
-npm run check                          # 3. make sure nothing is broken
-git add -A && git commit -m "new post" # 4. save
-git push                               # 5. publish
-```
+## 2. Requirements
 
-That's it. GitHub builds it with Hugo and ships it to Cloudflare — **once the deploy token in
-"Publishing" at the bottom is set up. Until then, use `npm run deploy` instead of `git push`
-to actually publish.** Pushing still saves your work either way.
+You need these items:
 
----
+- Node.js, version 22 or later
+- Hugo, version 0.166 or later, extended edition
+- The `gh` command, for the deploy token in section 8
 
-## One-time setup
-
-Already done on this machine, but if you're on a new one:
+Run this command to install Hugo:
 
 ```bash
-brew install hugo     # needs the "extended" build; brew's default is extended
-# Node 22 or newer
-cd ~/Projects/typocasual-hugo
-npm install
+brew install hugo
 ```
 
----
+## 3. Install the site
 
-## Commands
+1. Open a terminal.
+2. Go to the site folder:
 
-Run all of these from `~/Projects/typocasual-hugo`.
+   ```bash
+   cd ~/Projects/typocasual-hugo
+   ```
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Builds and serves a preview at **http://localhost:8787**. Use this instead of pushing when you're unsure. Ctrl-C to stop. |
-| `npm run check` | Validates your content. Run it before every commit. It's the seatbelt. |
-| `npm run build` | Turns `content/` + `layouts/` into `public/`. `dev` and `deploy` do this for you. |
-| `npm run new -- posts/slug.md` | Creates a new post from a template. The `--` matters. |
-| `npm run deploy` | Check, build, and push straight to Cloudflare, skipping git. Emergency lever. |
-| `npm run tail` | Streams live logs from the Worker. Almost never needed. |
+3. Install the Node.js packages:
 
----
+   ```bash
+   npm install
+   ```
 
-## Writing a post
+4. Make sure that the content is correct:
 
-### 1. Scaffold it
+   ```bash
+   npm run check
+   ```
 
-```bash
-npm run new -- posts/on-gutter-joints.md
-```
+   The command shows `✓` and a list of counts. A correct result shows no `✗`.
 
-The filename becomes the URL: `/posts/on-gutter-joints/`. Lowercase, hyphens, no spaces.
+## 4. Preview the site
 
-### 2. Fill in the top
+Do this procedure before you publish a change.
 
-Every post starts with a block between `---` lines. That's the important part.
+1. Start the preview server:
+
+   ```bash
+   npm run dev
+   ```
+
+2. Open a browser.
+3. Go to `http://localhost:8787`.
+4. Examine your change.
+5. Press `Ctrl` and `C` in the terminal. The server stops.
+
+## 5. Write a post
+
+### 5.1 Create the file
+
+1. Run this command. Replace `my-post` with your title:
+
+   ```bash
+   npm run new -- posts/my-post.md
+   ```
+
+2. The command creates one file in `content/posts/`.
+
+The file name becomes the web address. Use only lowercase letters and hyphens.
+
+### 5.2 Change the front matter
+
+The top of the file contains the front matter. The front matter is between two `---` lines.
 
 ```yaml
 ---
-title: "On gutter joints"
+title: "My post"
 date: 2026-07-02
-description: "One line. Shown under the title, in the index, and in link previews."
-seed: 102
+description: "One line. This line appears below the title."
+seed: 106
 growth: 0.5
-caption: "Gutter detail, 2024. Where it starts."
 ---
 ```
 
-| Field | What it's for |
-| --- | --- |
-| `title` | The headline. Also the browser tab and the link preview. |
-| `date` | Controls the order in the index. Newest first. |
-| `description` | The italic line under the title, and the summary in `/posts/`. Write one. |
-| `seed` | Picks which generated concrete image the post gets. **Every post needs a different number.** See below. |
-| `growth` | How overgrown that image is, `0` to `1`. Low is bare concrete, high is buried. |
-| `caption` | Small mono text under the image. Optional. |
-| `image` | Optional. A real photo instead of the generated one. See below. |
-| `draft` | Delete this line to publish. While it's there, the post stays hidden. |
+The table gives the purpose of each field.
 
-### 3. Write the body
+| Field | Purpose | Necessary |
+| --- | --- | --- |
+| `title` | The headline of the essay | Yes |
+| `date` | The sort order. The newest essay comes first. | Yes |
+| `description` | The line below the title. Also the summary in the index. | Yes |
+| `seed` | Selects the generated image. Section 5.3 gives the rules. | Yes |
+| `growth` | The moss quantity. Use a number from 0 to 1. | No |
+| `caption` | Small text below the image | No |
+| `image` | A real photograph. Section 5.4 gives the procedure. | No |
+| `draft` | Remove this line to publish the essay. | No |
 
-Ordinary Markdown. `##` for headings, `**bold**`, `[links](https://example.com)`, `-` for
-bullets, `>` for quotes, triple backticks for code. It all works and it's all already styled.
-Don't add HTML unless you want to.
+### 5.3 Select a seed
 
-### 4. Check and publish
+The site contains no photograph files for the frames and the essay images. The site
+calculates each image from a number. The number is the `seed`.
 
-```bash
-npm run check
-git add -A && git commit -m "post: on gutter joints" && git push
-```
+The same seed always gives the same image. Two essays with the same seed show the same
+image. Therefore, each seed must be different.
 
-### Picking a `seed`
+`npm run check` examines every seed. The command tells you the name of the essay that
+already uses a seed.
 
-The site has no photographs in it. Every image you see — the frames on the front page and
-the plate on each post — is **drawn by code from a number.** Same number, same picture,
-forever.
+### 5.4 Use a real photograph
 
-There are six different compositions, and the number picks which one and how it's arranged:
-`seed % 6` chooses the archetype, so seeds 7, 13, 19, 25… all look related but not identical.
+1. Copy the photograph into `static/images/`.
+2. Add this line to the front matter:
 
-**Two posts must never share a seed**, or they get the exact same photograph. `npm run check`
-catches this and tells you which post already has it. Just pick another number. Any number
-works; 100-and-something is a fine habit.
+   ```yaml
+   image: "/images/my-photo.jpg"
+   ```
 
-### Using a real photograph instead
+The photograph replaces the generated image for that essay only.
 
-Put the file in `static/images/`, then point at it:
+### 5.5 Write the body
 
-```yaml
-image: "/images/my-photo.jpg"
-```
+Write the body below the front matter. Use standard Markdown.
 
-That replaces the generated plate for that post. The front page frames are separate — those
-are always generated.
+- Use `##` for a heading.
+- Use `**text**` for bold text.
+- Use `[name](https://example.com)` for a link.
+- Use `-` for a bullet list.
+- Use `>` for a quotation.
 
----
+The site styles all of these items.
 
-## Editing the front page
+### 5.6 Remove the draft mark
 
-The front page is the **contact sheet**: a grid of frames. Its entire content is one file:
+1. Find the line `draft: true` in the front matter.
+2. Delete the line.
 
-```
-static/data.json
-```
+The essay does not appear on the site while the line is present.
 
-Open it and you'll see three lists: `filters`, `items` (the frames), and `links` (the cards
-underneath).
+## 6. Change the home intro
 
-### Adding a frame
+The text above the contact sheet comes from one file.
 
-Copy an existing block in `items` and change it. There are three kinds:
+1. Open `content/_index.md`.
+2. Change the text.
+3. Run `npm run check`.
 
-**A plate** — a generated concrete photograph:
+The file has no front matter fields. Write the text only.
 
-```jsonc
-{
-  "kind": "plate",
-  "stage": "encroaching",
-  "growth": 0.5,
-  "title": "North Wall",
-  "year": "2024",
-  "medium": "Silver gelatin",
-  "subject": "The shaded face",
-  "seed": 37
-}
-```
+## 7. Change the front page frames
 
-**A type specimen** — a typeface shown off:
+The frames come from one file. The name of the file is `static/data.json`.
 
-```jsonc
-{
-  "kind": "spec",
-  "stage": "bare",
-  "growth": 0.13,
-  "title": "Lora",
-  "year": "2025",
-  "medium": "Heading · 400–700",
-  "sample": "Rg",
-  "stack": "\"Lora\", Georgia, serif",
-  "weight": 700,
-  "specimen": "constant growth and decay"
-}
-```
+The file has three lists:
 
-**A card** — just text:
+- `filters` — the buttons above the grid
+- `items` — the frames in the grid
+- `links` — the cards below the grid
 
-```jsonc
-{
-  "kind": "note",
-  "stage": "bare",
-  "growth": 0.17,
-  "title": "Method",
-  "year": "2025",
-  "medium": "Card",
-  "body": "Every frame is the same size. The sheet does not rank the work."
-}
-```
+### 7.1 Add a frame
 
-The required fields are listed in the table below. `npm run check` will tell you if you
-forget one.
+1. Copy one object in the `items` list.
+2. Change the values.
+3. Keep the commas correct.
+4. Run `npm run check`.
 
-| `kind` | Needs |
-| --- | --- |
-| `plate` | `seed` |
-| `spec` | `sample`, `stack`, `specimen` |
-| `note` | `body` |
+Select the frame type from this table.
 
-All three need `kind`, `stage`, `growth` and `title`.
+| `kind` | Result | Necessary fields |
+| --- | --- | --- |
+| `plate` | A generated concrete photograph | `seed` |
+| `spec` | A type specimen | `sample`, `stack`, `specimen` |
+| `note` | A text card | `body` |
 
-### Adding a link
+All three types also need `kind`, `stage`, `growth`, and `title`.
 
-Under `links`:
+### 7.2 Add a link card
 
-```jsonc
-{
-  "title": "Bluesky",
-  "url": "https://bsky.app/profile/your-handle",
-  "handle": "@your-handle",
-  "desc": "Short things, posted while walking.",
-  "growth": 0.3,
-  "seed": 65
-}
-```
+1. Copy one object in the `links` list.
+2. Change the values.
+3. Make sure that the `url` value starts with `https://`.
 
-The domain shown on the card, and the little icon, are both derived from the `url` — you
-don't write them. The `url` must start with `https://`.
+The site calculates the domain name and the small icon from the `url` value.
 
----
+### 7.3 Use the growth value
 
-## What `growth` means
+The `growth` value is a number from 0 to 1. The value controls the moss on the frame.
 
-Every frame and every post carries a `growth` number from `0` to `1`. It is the site's own
-idea, and it's the only thing that makes the design mean anything: **how long this thing has
-been out in the weather.**
+- `0` gives bare concrete.
+- `1` gives a fully covered frame.
 
-- `0` — bare concrete. Nothing has taken hold.
-- `1` — buried. You can hardly see it.
-
-It draws the moss, and it's printed in the lightbox as a percentage. Read the sheet left to
-right and the structure gives way.
-
-There's a second field, `stage`, which is just the label for that number. It has to agree
-with it:
+The `stage` field is the label for the number. The label must agree with the number.
 
 | `stage` | `growth` |
 | --- | --- |
 | `bare` | 0 to 0.34 |
 | `encroaching` | 0.34 to 0.67 |
-| `consumed` | over 0.67 |
+| `consumed` | more than 0.67 |
 
-If they disagree, `npm run check` stops you, because otherwise the badge on the frame would
-contradict the moss on it.
+If the label and the number disagree, `npm run check` stops the deploy.
 
----
+## 8. Publish the site
 
-## The file map
+1. Run the check:
 
-```
-~/Projects/typocasual-hugo/
-│
-├── content/posts/            ← YOUR POSTS LIVE HERE
-│   ├── _index.md               (the /posts/ page heading — rarely touched)
-│   └── *.md                    one file per post
-│
-├── static/data.json          ← THE FRONT PAGE LIVES HERE
-├── static/data.schema.json     the rules for the file above
-│
-├── static/styles.css           all the colours and layout
-├── static/app.js               the code that draws frames and moss
-├── static/og.jpg               the preview image when you share a link
-├── static/images/              (make this if you want to add real photos)
-│
-├── layouts/                    the page templates
-│   ├── index.html              the front page
-│   ├── _default/single.html    a post page
-│   ├── _default/list.html      the /posts/ index
-│   ├── 404.html                the "not found" page
-│   ├── index.llms.txt          generates /llms.txt
-│   └── partials/               the shared top bar, footer, moss, etc.
-│
-├── scripts/check.mjs           the validator behind `npm run check`
-├── .github/workflows/deploy.yml  what runs on every push
-├── public/                     BUILD OUTPUT — DO NOT EDIT, it gets wiped
-├── hugo.toml                   site settings
-├── wrangler.jsonc              Cloudflare settings
-├── README.md                   this file
-└── AGENTS.md                   the technical contract, for coding agents
-```
+   ```bash
+   npm run check
+   ```
 
-### Yours to edit freely
+2. Save the change:
 
-- `content/posts/*.md` — your writing
-- `static/data.json` — the front page's content
-- `static/images/` — your photos
+   ```bash
+   git add -A
+   git commit -m "add a post"
+   ```
 
-### Fine to touch, but they change how it *looks*
+3. Send the change to GitHub:
 
-- `static/styles.css` — the colours are all at the top, in `:root` and the two
-  `[data-theme="..."]` blocks. Change those and the whole site follows.
+   ```bash
+   git push
+   ```
 
-### Leave alone unless you know why
+GitHub builds the site and sends it to Cloudflare. The operation takes about one minute.
 
-- `public/` — generated. Anything you put there is deleted on the next build.
-- `layouts/` — the page structure. Editing these is how you break the site.
-- `scripts/check.mjs` — the validator. If you weaken it, it stops catching your mistakes.
-- `wrangler.jsonc` — the Worker config. Wrong here and the site 404s.
+**Important:** the automatic deploy needs a Cloudflare token. Section 12 gives the
+procedure. Until you do that procedure, use `npm run deploy` in place of step 3.
 
----
+## 9. Understand the files
 
-## The five rules
+| Path | Purpose | Safe to change |
+| --- | --- | --- |
+| `content/_index.md` | The home intro | Yes |
+| `content/posts/*.md` | The essays | Yes |
+| `static/data.json` | The frames and the links | Yes |
+| `static/images/` | Your photographs | Yes |
+| `static/styles.css` | The colours and the layout | Yes, with care |
+| `layouts/` | The page structure | No |
+| `scripts/check.mjs` | The check program | No |
+| `public/` | The built site | No |
+| `hugo.toml` | The site settings | No |
+| `wrangler.jsonc` | The Cloudflare settings | No |
+| `README.md` | This manual | Yes |
+| `AGENTS.md` | The rules for a coding agent | No |
 
-1. **Run `npm run check` before you commit.** It catches almost everything on this page and
-   explains the problem in plain words.
+## 10. Obey these rules
 
-2. **Never edit anything in `public/`.** It is rebuilt from scratch every time. Your changes
-   will vanish.
+1. Run `npm run check` before you save a change.
+2. Do not change a file in `public/`. Hugo deletes the folder at each build.
+3. Give each seed a different number.
+4. Do not correct the spelling of `typocasual`. The red line below the word is the logo.
+5. Do not copy the Obsidian vault to this site. The vault has a different web site.
+6. Change a colour in both theme blocks. The blocks are `[data-theme="dark"]` and
+   `[data-theme="light"]` in `static/styles.css`.
 
-3. **Every `seed` must be unique — across posts *and* front-page frames.** They share one
-   generator. A repeat means two pages show the same picture.
+## 11. Find the cause of a problem
 
-4. **The word `typocasual` is spelled wrong on purpose.** The red squiggle under it is the
-   logo. Don't fix it.
+Run `npm run check` first. The command finds most problems. A `⚠` mark is a warning. A
+warning does not stop the deploy. A `✗` mark is an error. An error stops the deploy.
 
-5. **This site is not your Obsidian vault.** Don't sync the vault, your notes, or your resume
-   here. The vault has its own digital garden. This is a separate thing on purpose.
+| Message or symptom | Cause | Action |
+| --- | --- | --- |
+| `missing required field "seed"` | A plate has no seed. | Add a `seed` number to the frame. |
+| `must be one of "note" \| "spec" \| "plate"` | The `kind` value has a spelling error. | Correct the `kind` value. |
+| `seed 101 is already used by "..."` | Two essays have the same seed. | Change the seed number. |
+| `seed 101 is already frame "..."` | An essay and a frame have the same seed. | Change the seed number. |
+| `stage "bare" disagrees with growth 0.9` | The label and the number disagree. | Change the label or the number. Section 7.3 gives the table. |
+| `is not in data.schema.json — typo` | A field name has a spelling error. | Correct the field name. |
+| `matches no frame — the button will show 00` | A filter matches no frame. | Correct the filter `id`, or add a frame. |
+| `looks up #x, but no template defines it` | The code and the template disagree. | Stop. This is a fault in the code, not in your text. |
+| `front matter has no "title"` | An essay has no title. | Add the `title` field. |
+| `growth must be between 0 and 1` | The growth number is out of range. | Use a number from 0 to 1. |
+| `marked draft, so it will not be published` | The draft line is present. | This is usual. Delete `draft: true` to publish. |
+| The text is absent from the preview | The draft line is present, or the server is old. | Delete `draft: true`. Start `npm run dev` again. |
+| The image is the same on two pages | Two seeds are equal. | Change one seed number. |
+| `npm run check` reports a layout error | A file in `layouts/` changed. | Run `git diff layouts/`. Then run `git checkout -- layouts/` to undo the change. |
+| The site shows `404` after a deploy | The build failed, or the address is wrong. | Examine the GitHub Actions log. |
+| The deploy stops with `CLOUDFLARE_API_TOKEN` | The token is absent. | Do the procedure in section 12. |
 
----
+## 12. Set the Cloudflare token
 
-## When it complains
+Do this procedure one time.
 
-`npm run check` is the thing that talks to you. It prints `✓` when it's happy and `✗` plus a
-list when it isn't. Warnings (`⚠`) don't stop a deploy; errors do.
+1. Open the Cloudflare dashboard.
+2. Go to **My Profile**, then **API Tokens**.
+3. Select **Create Token**.
+4. Select the **Edit Cloudflare Workers** template.
+5. Select **Continue to summary**, then **Create Token**.
+6. Copy the token.
+7. Run this command. Paste the token when the command asks for it:
 
-| What it says | What it means |
-| --- | --- |
-| `missing required field "seed"` | A plate needs a seed number. Add one. |
-| `must be one of "note" \| "spec" \| "plate"` | You typo'd `kind`. |
-| `seed 101 is already used by "..."` | Two posts share a picture. Change the number. |
-| `stage "bare" disagrees with growth 0.9` | Those two must match. See the table above. |
-| `is not in data.schema.json — typo?` | You misspelled a field name. |
-| `matches no frame — the button will show 00` | A filter in `data.json` doesn't match any frame. |
-| `looks up #something, but no template defines it` | Code/template mismatch. **Stop and get help** — this one is a bug, not a typo. |
-| `front matter has no "title"` | A post is missing `title`. |
+   ```bash
+   gh secret set CLOUDFLARE_API_TOKEN --repo veekdur/typocasual-website
+   ```
 
-If a build fails with something about templates or `layouts/`, that's not your content —
-that's structure. Check `git status` and `git diff` to see what changed, and consider
-`git checkout -- layouts/` to undo it.
+8. Run this command:
 
-### Undoing things
+   ```bash
+   gh secret set CLOUDFLARE_ACCOUNT_ID --repo veekdur/typocasual-website \
+     --body 371b07f7e80f69e81b04a5ed7ca06fca
+   ```
 
-```bash
-git status              # what have I changed?
-git diff                # what exactly changed?
-git checkout -- <file>  # undo changes to one file
-git log --oneline       # what have I committed?
-```
+## 13. Undo a change
 
-If you push something broken, the fix is another push. Nothing here is destructive.
+1. Run `git status`. The command shows the changed files.
+2. Run `git diff`. The command shows the change.
+3. Run `git checkout -- <file>` to undo the change in one file.
 
-### Previewing before you commit
+A push is not permanent. Correct the file and push again.
 
-```bash
-npm run dev
-```
+## 14. Get help
 
-Opens a preview at http://localhost:8787 with your changes, unpublished. This is the safe way
-to try something. Ctrl-C when you're done.
+Use these sources:
 
----
-
-## Publishing, and the one thing that isn't set up
-
-Pushing to `main` triggers GitHub Actions, which validates, builds, and deploys. **That last
-step needs a Cloudflare API token that isn't configured yet.** Until it is, the automated
-deploy fails at the final step (the check and build still pass).
-
-To fix it once:
-
-```bash
-# Cloudflare dashboard → My Profile → API Tokens → Create Token
-# → use the "Edit Cloudflare Workers" template
-gh secret set CLOUDFLARE_API_TOKEN --repo veekdur/typocasual-website
-gh secret set CLOUDFLARE_ACCOUNT_ID  --repo veekdur/typocasual-website
-# account ID: 371b07f7e80f69e81b04a5ed7ca06fca
-```
-
-Until then, `npm run deploy` from this folder publishes directly and works fine.
-
----
-
-## What's in here right now
-
-**All of the content is placeholder.** The twenty frames describe a fictional photo series
-about a brutalist building; the three posts are essays written to that theme. They exist to
-show the design working and to give you something to overwrite.
-
-Nothing references your notes, your vault, or your resume — deliberately. Replace the frames
-and the posts with your own things when you're ready.
-
-The bottom of the page has a link list. GitHub, Pika and Letterbird are in there; Bluesky,
-Mastodon and Threads are not, because I didn't want to guess your handles. Add them under
-`links` in `static/data.json`.
-
----
-
-## If you get lost
-
-- `npm run check` — the fastest way to find out if something is wrong
-- `AGENTS.md` — the same rules, written for a coding agent. If you're working with Claude or
-  another assistant, point it at that file and it'll know what it's doing.
-- `/llms.txt` on the live site — a machine-readable summary of everything published
-- The live site: https://typotypocasual.victroyarroyo.workers.dev
+- `npm run check` — the fastest method to find a problem
+- `AGENTS.md` — the same rules, written for a coding agent
+- `https://typotypocasual.victroyarroyo.workers.dev/llms.txt` — a machine-readable summary
+- `https://typotypocasual.victroyarroyo.workers.dev` — the live site

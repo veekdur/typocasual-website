@@ -32,6 +32,15 @@
   </div>
 </header>
 
+{{- /* The vault's front page, kept in content/_index.md. Edit it there, not here. */ -}}
+{{- with .Content }}
+<section class="welcome" aria-label="Welcome">
+  <div class="welcome__inner">
+    <div class="prose">{{ . }}</div>
+  </div>
+</section>
+{{- end }}
+
 <!-- ── Filters ───────────────────────────────────────────────────────── -->
 <nav class="filters" aria-label="Filter frames">
   <div class="filters__inner" role="group" aria-label="Filter by state">

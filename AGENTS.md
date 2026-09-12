@@ -38,6 +38,7 @@ duplicate it into a page template.
 | --- | --- |
 | `static/data.json` | **The sheet's content.** Frames, filters, outbound links. Most sheet edits touch only this. |
 | `static/data.schema.json` | The shape of `data.json`. Published at `/data.schema.json`. |
+| `content/_index.md` | **The home intro**, above the sheet. Rendered via `{{ .Content }}` in `layouts/index.html`. |
 | `content/posts/*.md` | **The essays.** One file per post, YAML front matter. |
 | `archetypes/posts.md` | The scaffold used by `npm run new`. |
 | `scripts/check.mjs` | Validation. Runs in CI. No dependencies. |
@@ -136,8 +137,15 @@ Outbound links go in `links` and render as preview cards under the sheet:
 ## Do not
 
 - **Do not publish the Obsidian vault here.** There is a separate digital garden for that.
-  The owner explicitly does not want vault notes on this site. The sheet's demo frames and
-  sample essays are placeholder content, not documents to be replaced with vault material.
+  This rule stands. There is exactly one recorded exception: three published vault notes
+  were imported once, as a test, with the owner's explicit approval.
+  - `content/_index.md` — from *What is Typocasual?*, the vault's home note
+  - `content/posts/hands.md` — from *hands*
+  - `content/posts/typocasual-title.md` — from *typocasual title*
+
+  Do not extend this. Do not sync further notes, do not import drafts, and do not import
+  anything from the inbox. Ask the owner before you add any other vault content. Everything
+  else on the sheet and in `content/posts/` is placeholder material written for this site.
 - **Do not put the owner's resume, employment history, or personal records here.**
 - **Do not write a second copy of the rail, footer, or moss overlay** into a page template.
   They are partials.

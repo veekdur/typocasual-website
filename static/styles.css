@@ -341,6 +341,25 @@ a:hover { color: var(--moonlight); }
   color: var(--moss-bright);
 }
 
+/* ── Welcome — the home intro, above the sheet ──────────────────────── */
+
+.welcome {
+  background: linear-gradient(180deg, var(--slab-0), var(--slab-1));
+  border-bottom: var(--seam-w) solid var(--rule);
+}
+
+.welcome__inner {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: clamp(30px, 4.4vw, 64px) var(--gutter);
+}
+
+/* Longer than a lede, so it gets the same reading column as an essay. */
+.welcome__inner .prose {
+  max-width: 68ch;
+  font-size: 16px;
+}
+
 /* ── Filters ────────────────────────────────────────────────────────── */
 
 .filters {
