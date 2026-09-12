@@ -1,4 +1,10 @@
 node_modules/
+
+# Hugo writes the deployed site here; wrangler uploads it. Not source.
+public/
+resources/
+hugo_stats.json
+
 .wrangler/
 .dev.vars
 .DS_Store

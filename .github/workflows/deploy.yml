@@ -1,4 +1,4 @@
-name: Deploy
+name: Build and deploy
 
 on:
   push:
@@ -11,23 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Content is validated before anything reaches Cloudflare, so a malformed
-  # edit to public/data.json fails here instead of shipping a broken sheet.
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Validate public/data.json against data.schema.json
-        run: node scripts/check.mjs
-
-  deploy:
-    needs: check
-    if: github.event_name != 'pull_request'
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +24,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.166.0"
+          extended: true
+
+      # Validate content before building, so a malformed edit fails with a
+      # readable message instead of a confusing template error.
+      - name: Validate content
+        run: npm run check
+
+      - name: Build the site
+        run: npm run build
+
       - name: Deploy to Cloudflare Workers
+        if: github.event_name != 'pull_request'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

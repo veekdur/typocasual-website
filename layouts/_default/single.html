@@ -1,0 +1,51 @@
+{{ define "main" }}
+{{- $seed := .Params.seed | default 1 -}}
+{{- $growth := .Params.growth | default 0.25 -}}
+
+<article class="essay" id="main">
+  <div class="essay__grid">
+
+    <aside class="essay__aside">
+      <div class="essay__plate">
+        {{- with .Params.image }}
+          <img src="{{ . | relURL }}" alt="{{ $.Params.imageAlt | default "" }}" loading="eager" decoding="async">
+        {{- else }}
+          {{/* No image supplied, so app.js draws a concrete plate from the seed. */}}
+          <div data-plate-seed="{{ $seed }}" data-plate-growth="{{ $growth }}"></div>
+        {{- end }}
+      </div>
+      {{- with .Params.caption }}
+      <p class="essay__caption">{{ . }}</p>
+      {{- end }}
+    </aside>
+
+    <div class="essay__body">
+      <p class="essay__meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02.01.2006" }}</time>
+        <span aria-hidden="true">·</span>
+        <span>{{ .ReadingTime }} min</span>
+        {{- with .Params.growth }}
+        <span aria-hidden="true">·</span>
+        <span>Growth {{ printf "%.0f%%" (mul . 100) }}</span>
+        {{- end }}
+      </p>
+
+      <h1 class="essay__title">{{ .Title }}</h1>
+
+      {{- with .Description }}
+      <p class="essay__standfirst">{{ . }}</p>
+      {{- end }}
+
+      <div class="prose">{{ .Content }}</div>
+
+      <nav class="essay__foot" aria-label="Essay navigation">
+        <a href="/posts/">← All essays</a>
+        {{- with .NextInSection }}
+        <a href="{{ .RelPermalink }}">{{ .Title }} →</a>
+        {{- end }}
+      </nav>
+    </div>
+
+  </div>
+</article>
+{{ end }}

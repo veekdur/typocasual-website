@@ -2,12 +2,14 @@
   "name": "typocasual-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Typo Casual — brutalist contact sheet, slowly reclaimed by moss.",
+  "description": "Typo Casual — a brutalist contact sheet, slowly reclaimed by moss. Hugo builds the essays; Cloudflare serves the static output.",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "npm run check && wrangler deploy",
+    "build": "hugo",
+    "dev": "hugo && wrangler dev",
+    "deploy": "npm run check && npm run build && wrangler deploy",
     "check": "node scripts/check.mjs",
-    "sync": "node scripts/sync.mjs",
+    "new": "hugo new content",
+    "og": "swift scripts/make-og.swift static/og.jpg",
     "tail": "wrangler tail"
   },
   "devDependencies": {

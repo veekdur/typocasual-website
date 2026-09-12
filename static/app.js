@@ -8,6 +8,7 @@
   'use strict';
 
   const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const svgNS = 'http://www.w3.org/2000/svg';
@@ -529,22 +530,25 @@
     fillLightbox(state.shown[nextPos]);
   }
 
-  lb.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeLightbox(); });
-  $('#lb-prev').addEventListener('click', () => step(-1));
-  $('#lb-next').addEventListener('click', () => step(1));
+  // The lightbox only exists on the sheet; essays share this script.
+  if (lb) {
+    lb.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeLightbox(); });
+    $('#lb-prev').addEventListener('click', () => step(-1));
+    $('#lb-next').addEventListener('click', () => step(1));
 
-  document.addEventListener('keydown', (e) => {
-    if (lb.hidden) return;
-    if (e.key === 'Escape') { closeLightbox(); return; }
-    if (e.key === 'ArrowLeft') { step(-1); return; }
-    if (e.key === 'ArrowRight') { step(1); return; }
-    if (e.key !== 'Tab') return;
-    // Keep focus inside the dialog.
-    const focusable = [...lb.querySelectorAll('button:not([disabled])')];
-    const first = focusable[0], last = focusable[focusable.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  });
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') { closeLightbox(); return; }
+      if (e.key === 'ArrowLeft') { step(-1); return; }
+      if (e.key === 'ArrowRight') { step(1); return; }
+      if (e.key !== 'Tab') return;
+      // Keep focus inside the dialog.
+      const focusable = [...lb.querySelectorAll('button:not([disabled])')];
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
 
   /* ── Theme ────────────────────────────────────────────────────────── */
 
@@ -585,6 +589,17 @@
   /* ── Boot ─────────────────────────────────────────────────────────── */
 
   growVines();
+
+  /* Essay pages ask for a plate without shipping data.json, so let any element
+     carry a seed and get the same generated concrete image. */
+  $$('[data-plate-seed]').forEach((host) => {
+    const seed = Number(host.dataset.plateSeed) || 1;
+    const growth = Number(host.dataset.plateGrowth) || 0;
+    host.append(plateSVG(seed, growth));
+  });
+
+  // Only the sheet needs the content file.
+  if (!$('#sheet')) return;
 
   fetch('/data.json', { cache: 'no-cache' })
     .then((r) => { if (!r.ok) throw new Error(`data.json ${r.status}`); return r.json(); })

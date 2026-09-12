@@ -1,0 +1,45 @@
+# Hugo builds the site into public/, which is what wrangler uploads as static
+# assets. Nothing here needs a plugin or a Node dependency.
+
+baseURL = "https://typotypocasual.victroyarroyo.workers.dev/"
+locale = "en-GB"
+title = "typocasual"
+enableRobotsTXT = true
+
+# No tag or category pages — the sheet is the index, and essays are a stream.
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  tagline = "a structure, left out in the weather"
+  description = "A contact sheet. A brutalist structure, photographed and slowly reclaimed. Every frame printed at the same size; nothing ranked."
+  # The word typocasual is a deliberate misspelling; the red squiggle is the mark.
+  ogImage = "/og.jpg"
+
+# llms.txt is generated from static/data.json and the essays, so it can never
+# drift from the content the way a hand-written file would.
+[outputs]
+  home = ["HTML", "RSS", "llms"]
+  section = ["HTML", "RSS"]
+
+[outputFormats.llms]
+  mediaType = "text/plain"
+  baseName = "llms"
+  isPlainText = true
+  notAlternative = true
+
+[markup]
+  [markup.goldmark.renderer]
+    # Lets an essay drop in a <figure>, <aside> or <div class="..."> directly.
+    unsafe = true
+  [markup.goldmark.parser]
+    attribute = true
+    autoHeadingID = true
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+
+[server]
+  [[server.headers]]
+    for = "/**"
+    [server.headers.values]
+      Cache-Control = "no-store"

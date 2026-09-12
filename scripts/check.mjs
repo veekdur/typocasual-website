@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates public/data.json against public/data.schema.json, then runs the
+ * Validates static/data.json against static/data.schema.json, then runs the
  * semantic rules the schema cannot express.
  *
  * Runs in CI before every deploy, so a malformed edit cannot ship.
@@ -9,14 +9,13 @@
  *   node scripts/check.mjs
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, relative } from 'node:path';
-import { renderLlms } from './llms.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const DATA = resolve(ROOT, 'public/data.json');
-const SCHEMA = resolve(ROOT, 'public/data.schema.json');
+const DATA = resolve(ROOT, 'static/data.json');
+const SCHEMA = resolve(ROOT, 'static/data.schema.json');
 
 /** Growth bands. These are the contract for `stage`; keep in sync with AGENTS.md. */
 const BANDS = [
@@ -206,15 +205,26 @@ for (const [i, link] of (data.links ?? []).entries()) {
 
 /* ── DOM contract ─────────────────────────────────────────────────────── */
 
-// Every element app.js looks up by id must exist in index.html. A renamed id
-// is the most common way an edit breaks this page, and it fails silently in
-// the browser, so it is worth a hard check here.
-const APP_SRC = readFileSync(resolve(ROOT, 'public/app.js'), 'utf8');
-const HTML_SRC = readFileSync(resolve(ROOT, 'public/index.html'), 'utf8');
+// Every element app.js looks up by id must exist somewhere under layouts/. A
+// renamed id is the most common way an edit breaks a page, and it fails
+// silently in the browser, so it is worth a hard check here.
+const APP_SRC = readFileSync(resolve(ROOT, 'static/app.js'), 'utf8');
 
-const declaredIds = new Set(
-  [...HTML_SRC.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]),
-);
+const layoutFiles = [];
+(function walk(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = resolve(dir, entry.name);
+    if (entry.isDirectory()) walk(full);
+    else if (entry.name.endsWith('.html')) layoutFiles.push(full);
+  }
+})(resolve(ROOT, 'layouts'));
+
+const declaredIds = new Set();
+for (const file of layoutFiles) {
+  for (const m of readFileSync(file, 'utf8').matchAll(/\bid="([^"]+)"/g)) {
+    declaredIds.add(m[1]);
+  }
+}
 
 // Created by app.js at runtime, so not expected in the markup.
 const RUNTIME_IDS = new Set(['ld-links']);
@@ -228,25 +238,63 @@ const lookedUp = new Set([
 
 for (const id of lookedUp) {
   if (!declaredIds.has(id) && !RUNTIME_IDS.has(id)) {
-    errors.push(`public/app.js looks up #${id}, but public/index.html does not define it`);
+    errors.push(`static/app.js looks up #${id}, but no template under layouts/ defines it`);
   }
 }
 
-/* ── Generated file freshness ─────────────────────────────────────────── */
+/* ── Essays ───────────────────────────────────────────────────────────── */
 
-// llms.txt is rendered from data.json. A stale copy is a lie to crawlers.
-const LLMS = resolve(ROOT, 'public/llms.txt');
-let llmsActual = null;
-try {
-  llmsActual = readFileSync(LLMS, 'utf8');
-} catch {
-  /* handled below */
+// Essays share the plate generator with the sheet, so a repeated seed means two
+// different pages show the same photograph.
+const POSTS_DIR = resolve(ROOT, 'content/posts');
+const essays = existsSync(POSTS_DIR)
+  ? readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md') && f !== '_index.md')
+  : [];
+
+/** Crude YAML front matter reader — enough for the flat keys an essay uses. */
+function frontMatter(file) {
+  const src = readFileSync(resolve(POSTS_DIR, file), 'utf8');
+  const block = src.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const out = {};
+  if (!block) return out;
+  for (const line of block[1].split(/\r?\n/)) {
+    const kv = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (kv) out[kv[1]] = kv[2].replace(/^["']|[ "']$/g, '').trim();
+  }
+  return out;
 }
 
-if (llmsActual === null) {
-  errors.push('public/llms.txt is missing — run `npm run sync`');
-} else if (llmsActual !== renderLlms(data)) {
-  errors.push('public/llms.txt is out of date with public/data.json — run `npm run sync`');
+const sheetSeeds = new Map();
+for (const item of items) {
+  if (item.kind === 'plate' && typeof item.seed === 'number') sheetSeeds.set(item.seed, item.title);
+}
+
+const essaySeeds = new Map();
+for (const file of essays) {
+  const fm = frontMatter(file);
+  const at = `content/posts/${file}`;
+
+  if (!fm.title) errors.push(`${at}: front matter has no "title"`);
+  if (fm.draft === 'true') { warnings.push(`${at}: marked draft, so it will not be published`); continue; }
+
+  const seed = Number(fm.seed);
+  if (Number.isFinite(seed)) {
+    if (sheetSeeds.has(seed)) {
+      warnings.push(`${at}: seed ${seed} is already frame "${sheetSeeds.get(seed)}" — the plates will look identical`);
+    } else if (essaySeeds.has(seed)) {
+      warnings.push(`${at}: seed ${seed} is already used by "${essaySeeds.get(seed)}"`);
+    }
+    essaySeeds.set(seed, fm.title);
+  } else {
+    warnings.push(`${at}: no "seed", so the plate falls back to 1 and will repeat`);
+  }
+
+  if (fm.growth !== undefined) {
+    const g = Number(fm.growth);
+    if (!Number.isFinite(g) || g < 0 || g > 1) {
+      errors.push(`${at}: growth must be between 0 and 1, got "${fm.growth}"`);
+    }
+  }
 }
 
 /* ── Report ───────────────────────────────────────────────────────────── */
@@ -261,7 +309,7 @@ if (warnings.length) {
 if (errors.length) {
   console.error(`\n✗ ${rel} failed validation — ${errors.length} error(s)\n`);
   for (const e of errors) console.error(`   ${e}`);
-  console.error('\n   Schema: public/data.schema.json   Guide: AGENTS.md\n');
+  console.error('\n   Schema: static/data.schema.json   Guide: AGENTS.md\n');
   process.exit(1);
 }
 
@@ -271,5 +319,6 @@ console.log(
   `   frames ${items.length}  ·  plates ${count('plate')}  ·  type ${count('spec')}  ·  cards ${count('note')}\n` +
   `   links  ${(data.links ?? []).length}\n` +
   `   growth ${Math.min(...items.map((i) => i.growth)).toFixed(2)} → ${Math.max(...items.map((i) => i.growth)).toFixed(2)}\n` +
-  `   dom    ${lookedUp.size} id(s) resolved, llms.txt in sync\n`,
+  `   dom    ${lookedUp.size} id(s) resolved across ${layoutFiles.length} template(s)\n` +
+  `   essays ${essays.length}\n`,
 );

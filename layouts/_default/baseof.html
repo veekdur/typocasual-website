@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+{{ partial "head.html" . }}
+<body>
+
+<a class="skip" href="{{ if .IsHome }}#sheet{{ else }}#main{{ end }}">
+  Skip to {{ if .IsHome }}frames{{ else }}content{{ end }}
+</a>
+
+{{ partial "defs.html" . }}
+
+<div class="grain" aria-hidden="true"></div>
+<div class="weathering" aria-hidden="true"></div>
+
+{{ partial "rail.html" . }}
+
+{{ block "main" . }}{{ end }}
+
+{{ partial "colophon.html" . }}
+{{ partial "overgrowth.html" . }}
+
+{{ block "modals" . }}{{ end }}
+
+<script src="/app.js"></script>
+</body>
+</html>
