@@ -1,0 +1,16 @@
+{
+  "name": "typocasual-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typo Casual — brutalist contact sheet, slowly reclaimed by moss.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "npm run check && wrangler deploy",
+    "check": "node scripts/check.mjs",
+    "sync": "node scripts/sync.mjs",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.131.1"
+  }
+}

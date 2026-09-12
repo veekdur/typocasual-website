@@ -1,0 +1,279 @@
+{
+  "meta": {
+    "title": "typocasual",
+    "tagline": "a structure, left out in the weather",
+    "blurb": "A contact sheet. Every frame printed at the same size, nothing ranked."
+  },
+  "filters": [
+    { "id": "all",   "label": "All frames" },
+    { "id": "plate", "label": "Plates" },
+    { "id": "spec",  "label": "Type" },
+    { "id": "note",  "label": "Cards" }
+  ],
+  "items": [
+    {
+      "kind": "note",
+      "stage": "bare",
+      "growth": 0.04,
+      "title": "Statement",
+      "year": "2026",
+      "medium": "Card",
+      "body": "Concrete was an argument about permanence. Moss is a shorter argument, and it is winning.",
+      "note": "Read the sheet left to right. The structure gives way as you go."
+    },
+    {
+      "kind": "plate",
+      "stage": "bare",
+      "growth": 0.06,
+      "title": "South Elevation",
+      "year": "2025",
+      "medium": "Silver gelatin",
+      "subject": "Raking light on the exposed face",
+      "seed": 7,
+      "note": "One hour before the shadow line reached the third floor."
+    },
+    {
+      "kind": "spec",
+      "stage": "bare",
+      "growth": 0.09,
+      "title": "Epilogue",
+      "year": "2025",
+      "medium": "Display · 400–900",
+      "sample": "Aa",
+      "stack": "\"Epilogue\", system-ui, sans-serif",
+      "weight": 800,
+      "specimen": "typocasual",
+      "note": "Carries the wordmark. The only face here set heavy enough to hold a wall up."
+    },
+    {
+      "kind": "plate",
+      "stage": "bare",
+      "growth": 0.13,
+      "title": "Colonnade",
+      "year": "2025",
+      "medium": "Silver gelatin",
+      "subject": "Eleven bays, receding",
+      "seed": 13,
+      "note": "Counted twice on site. Eleven, not twelve."
+    },
+    {
+      "kind": "note",
+      "stage": "bare",
+      "growth": 0.17,
+      "title": "Method",
+      "year": "2025",
+      "medium": "Card",
+      "body": "Every frame is the same size. The sheet does not rank the work — it lays it out, and lets the weather in.",
+      "note": "Nothing on this page is cropped to flatter."
+    },
+    {
+      "kind": "plate",
+      "stage": "bare",
+      "growth": 0.21,
+      "title": "Aperture Study",
+      "year": "2025",
+      "medium": "Silver gelatin",
+      "subject": "Light entering at a single point",
+      "seed": 26,
+      "note": "The brightest thing in the series, and the smallest."
+    },
+    {
+      "kind": "spec",
+      "stage": "encroaching",
+      "growth": 0.36,
+      "title": "Lora",
+      "year": "2025",
+      "medium": "Heading · 400–700",
+      "sample": "Rg",
+      "stack": "\"Lora\", Georgia, serif",
+      "weight": 700,
+      "specimen": "constant growth and decay",
+      "note": "Set against the concrete so the structure has a voice that is not shouting."
+    },
+    {
+      "kind": "plate",
+      "stage": "bare",
+      "growth": 0.25,
+      "title": "Service Tunnel",
+      "year": "2024",
+      "medium": "Silver gelatin",
+      "subject": "Zero daylight",
+      "seed": 31,
+      "note": "The only frame on the sheet with no growth in it."
+    },
+    {
+      "kind": "plate",
+      "stage": "encroaching",
+      "growth": 0.38,
+      "title": "Stair Core",
+      "year": "2024",
+      "medium": "Silver gelatin",
+      "subject": "Water ingress, north wall",
+      "seed": 12,
+      "note": "Mapped over four winters. The stain is the only thing here still changing shape."
+    },
+    {
+      "kind": "note",
+      "stage": "encroaching",
+      "growth": 0.46,
+      "title": "Materials",
+      "year": "2024",
+      "medium": "Card",
+      "body": "Board-marked concrete, galvanised steel, standing water. Then grass, moss, and eleven species nobody specified.",
+      "note": "The planting was never designed. It arrived."
+    },
+    {
+      "kind": "plate",
+      "stage": "encroaching",
+      "growth": 0.49,
+      "title": "Gutter Detail",
+      "year": "2024",
+      "medium": "Silver gelatin",
+      "subject": "Where it starts",
+      "seed": 41,
+      "note": "A joint that failed is a joint that became a bed."
+    },
+    {
+      "kind": "spec",
+      "stage": "encroaching",
+      "growth": 0.53,
+      "title": "Atkinson Hyperlegible",
+      "year": "2024",
+      "medium": "Reading · 200–800",
+      "sample": "Se",
+      "stack": "\"Atkinson Hyperlegible Next\", system-ui, sans-serif",
+      "weight": 400,
+      "specimen": "Readable is the whole point.",
+      "note": "Drawn for legibility, which is the opposite of what a typo is. Kept anyway."
+    },
+    {
+      "kind": "plate",
+      "stage": "encroaching",
+      "growth": 0.58,
+      "title": "North Wall",
+      "year": "2024",
+      "medium": "Silver gelatin",
+      "subject": "The shaded face",
+      "seed": 37,
+      "note": "Green on every surface that never dries out."
+    },
+    {
+      "kind": "plate",
+      "stage": "encroaching",
+      "growth": 0.64,
+      "title": "Loading Bay",
+      "year": "2024",
+      "medium": "Silver gelatin",
+      "subject": "The only elevation fully taken",
+      "seed": 19,
+      "note": "Grasses in the gutter joints. Structurally irrelevant, visually total."
+    },
+    {
+      "kind": "plate",
+      "stage": "consumed",
+      "growth": 0.72,
+      "title": "Foundation",
+      "year": "2023",
+      "medium": "Silver gelatin",
+      "subject": "At the waterline",
+      "seed": 44,
+      "note": "The heaviest part of the building, and the wettest."
+    },
+    {
+      "kind": "note",
+      "stage": "consumed",
+      "growth": 0.78,
+      "title": "Colophon",
+      "year": "2023",
+      "medium": "Card",
+      "body": "Set in system faces. Printed on a Cloudflare Worker. Growing at roughly a millimetre a year, which is faster than the concrete is aging.",
+      "note": "The red line under the title is the only part of this that is working exactly as intended."
+    },
+    {
+      "kind": "plate",
+      "stage": "consumed",
+      "growth": 0.83,
+      "title": "Roofline",
+      "year": "2023",
+      "medium": "Silver gelatin",
+      "subject": "Colonisation from above",
+      "seed": 23,
+      "note": "The sky is doing most of the structural work in this one."
+    },
+    {
+      "kind": "spec",
+      "stage": "consumed",
+      "growth": 0.87,
+      "title": "Atkinson Hyperlegible Mono",
+      "year": "2023",
+      "medium": "Mono · 200–700",
+      "sample": "01",
+      "stack": "\"Atkinson Hyperlegible Mono\", monospace",
+      "weight": 600,
+      "specimen": "FRAME 020 OF 020",
+      "note": "Frame numbers, captions, and everything the grid needed to say."
+    },
+    {
+      "kind": "plate",
+      "stage": "consumed",
+      "growth": 0.91,
+      "title": "Parapet",
+      "year": "2023",
+      "medium": "Silver gelatin",
+      "subject": "The edge, giving up",
+      "seed": 52,
+      "note": "Last frame before the sheet stops being readable as architecture."
+    },
+    {
+      "kind": "plate",
+      "stage": "consumed",
+      "growth": 0.97,
+      "title": "Podium",
+      "year": "2023",
+      "medium": "Silver gelatin",
+      "subject": "Fully returned",
+      "seed": 58,
+      "note": "You would not know there was a building here."
+    }
+  ],
+
+  "linksHead": {
+    "title": "Elsewhere",
+    "blurb": "Where the rest of it lives. The moss does not cross over, but the links do."
+  },
+
+  "links": [
+    {
+      "title": "GitHub",
+      "url": "https://github.com/veekdur",
+      "handle": "@veekdur",
+      "desc": "Code, tools, and experiments that got further than the kanban did.",
+      "growth": 0.18,
+      "seed": 61
+    },
+    {
+      "title": "Pika",
+      "url": "https://typocasual.pika.page",
+      "handle": "typocasual.pika.page",
+      "desc": "The blog. Mostly dormant, occasionally not. Longer things live here.",
+      "growth": 0.44,
+      "seed": 62
+    },
+    {
+      "title": "Letterbird",
+      "url": "https://letterbird.co/talktovictor",
+      "handle": "talktovictor",
+      "desc": "Send me something. Email, or anything shaped like it.",
+      "growth": 0.12,
+      "seed": 63
+    },
+    {
+      "title": "INSIG",
+      "url": "https://weareinsig.com",
+      "handle": "weareinsig.com",
+      "desc": "What my friends are doing. Better than what I am doing.",
+      "growth": 0.66,
+      "seed": 64
+    }
+  ]
+}

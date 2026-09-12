@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://typotypocasual.victroyarroyo.workers.dev/data.schema.json",
+  "title": "typocasual contact sheet data",
+  "description": "Contract for public/data.json. This file is the single source of truth for the shape of the site's content. scripts/check.mjs validates data.json against it and runs before every deploy.",
+  "type": "object",
+  "required": ["meta", "filters", "items"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Page-level copy. Not currently rendered — the masthead copy is in index.html.",
+      "properties": {
+        "title": { "type": "string" },
+        "tagline": { "type": "string" },
+        "blurb": { "type": "string" }
+      }
+    },
+    "filters": {
+      "type": "array",
+      "description": "The filter buttons, in order. Each id matches a frame's `kind` or `stage`. `all` is special and always matches everything.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "description": "The frames on the contact sheet, in display order.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "linksHead": {
+      "type": "object",
+      "description": "Heading copy for the outbound link sheet. Omit to leave that section empty.",
+      "properties": {
+        "title": { "type": "string" },
+        "blurb": { "type": "string" }
+      }
+    },
+    "links": {
+      "type": "array",
+      "description": "Outbound links rendered as preview cards under the sheet.",
+      "items": { "$ref": "#/$defs/link" }
+    }
+  },
+
+  "$defs": {
+    "item": {
+      "type": "object",
+      "description": "One frame. `kind` decides how the window is drawn; the fields it needs are enforced below.",
+      "required": ["kind", "stage", "growth", "title"],
+      "properties": {
+        "kind": {
+          "enum": ["note", "spec", "plate"],
+          "description": "note = text card, spec = type specimen, plate = generated concrete photograph."
+        },
+        "stage": {
+          "enum": ["bare", "encroaching", "consumed"],
+          "description": "Shown in the frame badge. Must agree with `growth`: see the bands in scripts/check.mjs."
+        },
+        "growth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "How overgrown the frame is. 0 = bare concrete, 1 = buried. Drives the moss height."
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "year": { "type": "string" },
+        "medium": { "type": "string", "description": "Shown in the caption bar and lightbox, e.g. \"Silver gelatin\"." },
+        "subject": { "type": "string", "description": "Plates only. Shown in the lightbox meta line." },
+        "body": { "type": "string", "description": "note only. Clamped to 7 lines in the frame, shown whole in the lightbox." },
+        "note": { "type": "string", "description": "Optional italic aside, lightbox only." },
+        "tags": { "type": "array", "items": { "type": "string" } },
+
+        "sample": { "type": "string", "description": "spec only. The large glyphs, e.g. \"Aa\"." },
+        "stack": { "type": "string", "description": "spec only. A CSS font-family value, e.g. \"\\\"Lora\\\", Georgia, serif\"." },
+        "weight": { "type": "number", "minimum": 100, "maximum": 1000 },
+        "specimen": { "type": "string", "description": "spec only. The sample line of text." },
+
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "plate and link cards. Picks the composition. Same seed always produces the same image; the archetype rotates by seed % 6."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "note" } } },
+          "then": { "required": ["body"] }
+        },
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "spec" } } },
+          "then": { "required": ["sample", "stack", "specimen"] }
+        },
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "plate" } } },
+          "then": { "required": ["seed"] }
+        }
+      ]
+    },
+
+    "link": {
+      "type": "object",
+      "description": "One outbound link card. The preview shows a generated plate plus a monogram, with the destination favicon layered on top if it loads — so a dead link still renders.",
+      "required": ["title", "url", "desc"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "url": {
+          "type": "string",
+          "pattern": "^https://",
+          "description": "Must be absolute and https. The hostname is derived from this for the domain label and the favicon lookup."
+        },
+        "handle": { "type": "string", "description": "Secondary line, e.g. \"@veekdur\"." },
+        "desc": { "type": "string", "minLength": 1 },
+        "growth": { "type": "number", "minimum": 0, "maximum": 1 },
+        "seed": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

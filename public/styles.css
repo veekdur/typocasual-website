@@ -1,0 +1,1057 @@
+/* ══════════════════════════════════════════════════════════════════════
+   typocasual — contact sheet
+   Brutalist structure, unmanaged growth.
+   Palette derives from the Typocasual Forest design system
+   (99 System/Design System/Typocasual Forest/tokens.json) extended with
+   the concrete greys and signature red of the wordmark.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ─────────────────────────────────────────────────────────── */
+
+:root {
+  --font-head: "Lora", Georgia, "Times New Roman", serif;
+  --font-ui:   "Epilogue", system-ui, -apple-system, sans-serif;
+  --font-read: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", "Source Code Pro", ui-monospace, SFMono-Regular, monospace;
+
+  --seam-w: 1px;
+  --gutter: clamp(14px, 3.2vw, 40px);
+  --shell:  1560px;
+
+  --fast: 160ms;
+  --slow: 300ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Moonlit: concrete in low light, moss lit from nowhere. */
+[data-theme="dark"] {
+  --env-0:  #04100e;
+  --env-1:  #071815;
+  --slab-0: #0a1a16;
+  --slab-1: #0e211c;
+  --slab-2: #132a23;
+  --slab-3: #193429;
+
+  --seam:        rgba(214, 232, 220, 0.09);
+  --seam-strong: rgba(232, 244, 232, 0.20);
+  --rule:        rgba(232, 244, 232, 0.13);
+
+  --bone:       #e7eee7;
+  --bone-dim:   #a6b8aa;
+  --bone-faint: #77897e;
+
+  --moss-deep:   #25391a;
+  --moss-mid:    #47632e;
+  --moss-lit:    #7d9c4a;
+  --moss-bright: #bdd88c;
+
+  --moonlight: #e6d58f;
+  --clay:      #e6d58f;
+  --mist:      #8eafa8;
+  --squiggle:  #ff382c;
+
+  --plate-sky-0:  #cdd4c9;
+  --plate-sky-1:  #8ea08c;
+  --plate-lit:    #b4b1a6;
+  --plate-mid:    #83807a;
+  --plate-shadow: #45433d;
+  --plate-deep:   #1e1d1a;
+
+  --shadow-plate: 0 24px 70px rgba(0, 8, 6, 0.55);
+  --grain-op: 0.42;
+  --grain-blend: overlay;
+}
+
+/* Sunlit: pale concrete, deep green growth, green environment. */
+[data-theme="light"] {
+  --env-0:  #1f5635;
+  --env-1:  #103c26;
+  --slab-0: #eeebe2;
+  --slab-1: #e4e1d7;
+  --slab-2: #d8d4c9;
+  --slab-3: #cac5b9;
+
+  --seam:        rgba(31, 73, 43, 0.16);
+  --seam-strong: rgba(31, 73, 43, 0.30);
+  --rule:        rgba(31, 73, 43, 0.20);
+
+  --bone:       #17180f;
+  --bone-dim:   #4d5347;
+  --bone-faint: #75796c;
+
+  --moss-deep:   #2c4a1e;
+  --moss-mid:    #3f6b2c;
+  --moss-lit:    #5c8a3c;
+  --moss-bright: #86ad57;
+
+  --moonlight: #8c4f32;
+  --clay:      #8c4f32;
+  --mist:      #5d7967;
+  --squiggle:  #d92d20;
+
+  --plate-sky-0:  #f2f0e8;
+  --plate-sky-1:  #b9bfb4;
+  --plate-lit:    #d6d2c6;
+  --plate-mid:    #a09c90;
+  --plate-shadow: #6a675e;
+  --plate-deep:   #33322c;
+
+  --shadow-plate: 0 24px 60px rgba(10, 38, 23, 0.24);
+  --grain-op: 0.30;
+  --grain-blend: multiply;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(1200px 620px at 50% -10%, var(--env-1), transparent 70%),
+    linear-gradient(180deg, var(--env-1), var(--env-0));
+  background-color: var(--env-0);
+  color: var(--bone);
+  font-family: var(--font-read);
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; margin: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+ul, dl, dd { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a { color: var(--moss-bright); text-decoration-color: var(--seam-strong); text-underline-offset: 3px; }
+a:hover { color: var(--moonlight); }
+
+:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+.skip {
+  position: absolute; left: 50%; top: 0; translate: -50% -120%;
+  z-index: 100; padding: 12px 20px;
+  background: var(--slab-3); color: var(--bone);
+  font-family: var(--font-mono); font-size: 13px; text-transform: uppercase;
+  letter-spacing: 0.1em; text-decoration: none;
+  transition: translate var(--fast) var(--ease);
+}
+.skip:focus { translate: -50% 0; }
+
+/* The word typocasual is a permanent spelling error. Hold onto that. */
+.squiggle-word {
+  text-decoration: underline wavy var(--squiggle);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* ── Texture ────────────────────────────────────────────────────────── */
+
+.grain,
+.weathering {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.grain {
+  opacity: var(--grain-op);
+  mix-blend-mode: var(--grain-blend);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* Water staining, because the sheet lives outside. */
+.weathering {
+  background:
+    radial-gradient(420px 300px at 12% 8%,  rgba(120, 92, 54, 0.10), transparent 65%),
+    radial-gradient(520px 380px at 88% 22%, rgba(70, 96, 66, 0.13),  transparent 66%),
+    radial-gradient(700px 460px at 46% 96%, rgba(38, 66, 40, 0.16),  transparent 70%);
+}
+
+.defs { position: absolute; width: 0; height: 0; }
+
+/* ── Rail ───────────────────────────────────────────────────────────── */
+
+.rail {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: var(--seam-w) solid var(--rule);
+  background: var(--slab-0);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rail__cell {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  min-height: 40px;
+  color: var(--bone-faint);
+  border-right: var(--seam-w) solid var(--rule);
+  white-space: nowrap;
+}
+.rail__cell b { color: var(--bone-dim); font-weight: 600; }
+
+.rail__cell--btn {
+  margin-left: auto;
+  border-right: 0;
+  border-left: var(--seam-w) solid var(--rule);
+  color: var(--bone-dim);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.rail__cell--btn:hover { background: var(--slab-2); color: var(--bone); }
+.rail__cell--btn .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--moonlight);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--moonlight) 22%, transparent);
+}
+
+/* ── Masthead ───────────────────────────────────────────────────────── */
+
+.masthead {
+  position: relative;
+  border-bottom: var(--seam-w) solid var(--rule);
+  background:
+    linear-gradient(180deg, var(--slab-1), var(--slab-0));
+  overflow: hidden;
+}
+
+/* Raking light across the slab. */
+.masthead::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(102deg, transparent 34%, color-mix(in srgb, var(--moonlight) 9%, transparent) 52%, transparent 68%);
+  pointer-events: none;
+}
+
+.masthead__body {
+  position: relative;
+  z-index: 1;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: clamp(30px, 5.4vw, 76px) var(--gutter) clamp(34px, 5vw, 68px);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--moss-lit);
+  margin-bottom: clamp(14px, 2vw, 22px);
+}
+
+/* The logotype is a brutalist mark, not a heading — heavy sans, tight. */
+.wordmark {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: clamp(10px, 1.4vw, 16px);
+}
+
+.wordmark__text {
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 900;
+  font-size: clamp(2.6rem, 12.4vw, 10.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.055em;
+  color: var(--bone);
+  white-space: nowrap;
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--env-0) 60%, transparent);
+}
+
+.squiggle {
+  position: absolute;
+  left: -0.5%;
+  right: -0.5%;
+  bottom: -0.16em;
+  width: 101%;
+  height: clamp(10px, 1.5vw, 22px);
+  overflow: visible;
+}
+.squiggle__path {
+  fill: none;
+  stroke: var(--squiggle);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--squiggle) 45%, transparent));
+}
+
+.tagline {
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.1vw, 1.6rem);
+  color: var(--moonlight);
+  margin-bottom: clamp(24px, 3.4vw, 40px);
+}
+
+.masthead__cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  max-width: 74ch;
+  padding-bottom: clamp(22px, 3vw, 34px);
+}
+@media (min-width: 820px) {
+  .masthead__cols { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+
+.lede { color: var(--bone-dim); }
+.lede--quiet { color: var(--bone-faint); font-size: 0.94rem; }
+
+.epigraph {
+  margin: 0;
+  padding-left: clamp(14px, 2vw, 22px);
+  border-left: 3px solid var(--moss-mid);
+  max-width: 52ch;
+}
+.epigraph p {
+  font-family: var(--font-head);
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  color: var(--moss-bright);
+}
+
+/* ── Filters ────────────────────────────────────────────────────────── */
+
+.filters {
+  position: relative;
+  z-index: 10;
+  border-bottom: var(--seam-w) solid var(--rule);
+  background: var(--slab-1);
+}
+
+.filters__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  max-width: var(--shell);
+  margin: 0 auto;
+  border-left: var(--seam-w) solid var(--rule);
+}
+
+.filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 0 clamp(14px, 2vw, 24px);
+  border-right: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.filter:hover { background: var(--slab-2); color: var(--bone); }
+
+.filter__n {
+  font-size: 10px;
+  color: var(--bone-faint);
+  opacity: 0.65;
+}
+
+.filter[aria-pressed="true"] {
+  background: var(--slab-3);
+  color: var(--bone);
+  box-shadow: inset 0 -3px 0 0 var(--moss-lit);
+}
+.filter[aria-pressed="true"] .filter__n { color: var(--moss-lit); opacity: 1; }
+
+.filters__note {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 9px var(--gutter);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--bone-faint);
+  border-top: var(--seam-w) solid var(--rule);
+}
+
+/* ── Contact sheet ──────────────────────────────────────────────────── */
+
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 292px), 1fr));
+  gap: var(--seam-w);
+  max-width: var(--shell);
+  margin: 0 auto;
+  /* The gaps are the mortar. Frame slabs sit on top of it. */
+  background: var(--seam-strong);
+  border-bottom: var(--seam-w) solid var(--seam-strong);
+  border-inline: var(--seam-w) solid var(--rule);
+}
+
+.nojs {
+  grid-column: 1 / -1;
+  padding: 60px var(--gutter);
+  background: var(--slab-1);
+  color: var(--bone-dim);
+  text-align: center;
+}
+
+/* ── Frame ──────────────────────────────────────────────────────────── */
+
+.frame {
+  --g: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  background: var(--slab-1);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.frame__no {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  padding: 6px 9px;
+  background: var(--slab-0);
+  border-right: var(--seam-w) solid var(--rule);
+  border-bottom: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--bone-faint);
+}
+
+.frame__stage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  padding: 6px 9px;
+  background: var(--slab-0);
+  border-left: var(--seam-w) solid var(--rule);
+  border-bottom: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+.frame__stage[data-stage="bare"]        { color: var(--mist); }
+.frame__stage[data-stage="encroaching"] { color: var(--moonlight); }
+.frame__stage[data-stage="consumed"]    { color: var(--moss-lit); }
+
+/* The window: whatever is inside the frame. */
+.frame__win {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--slab-2);
+}
+
+.frame__win svg,
+.frame__win img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.frame__trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+}
+.frame__trigger:focus-visible { outline-offset: -4px; }
+
+/* Caption bar — the contact sheet strip. */
+.frame__cap {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--slab-0);
+  border-top: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+.frame__cap b { color: var(--bone-dim); font-weight: 600; }
+.frame__cap span:last-child { margin-left: auto; }
+
+/* ── Specimen frames ────────────────────────────────────────────────── */
+
+.spec {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 16px 16px;
+  background:
+    linear-gradient(168deg, var(--slab-3), var(--slab-1) 62%);
+}
+
+.spec__glyph {
+  font-size: clamp(4.4rem, 11vw, 7.4rem);
+  line-height: 0.9;
+  color: var(--bone);
+  letter-spacing: -0.04em;
+}
+
+.spec__line {
+  font-size: clamp(0.95rem, 2.3vw, 1.25rem);
+  line-height: 1.3;
+  color: var(--bone-dim);
+  margin-top: 6px;
+}
+
+.spec__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* ── Note frames ────────────────────────────────────────────────────── */
+
+.note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 40px 16px 16px;
+  background: linear-gradient(180deg, var(--slab-2), var(--slab-1));
+}
+
+.note__head {
+  font-family: var(--font-head);
+  font-size: 1.06rem;
+  line-height: 1.24;
+  color: var(--bone);
+}
+
+.note__body {
+  font-family: var(--font-read);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--bone-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: auto;
+}
+.tag {
+  padding: 3px 7px;
+  border: 1px solid var(--seam-strong);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* ── The moss on each frame ─────────────────────────────────────────── */
+
+/* How overgrown a frame is = how raw the note is. Published work is
+   exposed concrete; ideas are nearly buried. */
+.frame__moss,
+.frame__tuft { position: absolute; z-index: 3; pointer-events: none; }
+
+.frame__moss {
+  left: -8%;
+  right: -8%;
+  bottom: -6%;
+  height: calc(9% + var(--g) * 52%);
+  background: linear-gradient(to top, var(--moss-deep) 0%, var(--moss-mid) 58%, var(--moss-lit) 100%);
+  border-radius: 46% 54% 0 0 / 82% 74% 0 0;
+  translate: 0 0;
+  transition: translate var(--slow) var(--ease), filter var(--slow) var(--ease);
+}
+
+/* Lit fringe on top of the bank — reads as depth, not a flat shape. */
+.frame__tuft {
+  left: -6%;
+  right: -6%;
+  bottom: -4%;
+  height: calc(5% + var(--g) * 26%);
+  background: linear-gradient(to top, var(--moss-mid), var(--moss-bright));
+  border-radius: 58% 42% 0 0 / 90% 84% 0 0;
+  opacity: calc(0.35 + var(--g) * 0.65);
+  transition: translate var(--slow) var(--ease), opacity var(--slow) var(--ease);
+}
+
+/* Hover unearths the frame: the growth pulls back and the plate brightens. */
+.frame:hover .frame__moss { translate: 0 46%; filter: saturate(1.25); }
+.frame:hover .frame__tuft { translate: 0 58%; opacity: 0.2; }
+.frame:hover .frame__win svg,
+.frame:hover .frame__win img { filter: brightness(1.09) contrast(1.03); }
+
+.frame__win svg,
+.frame__win img,
+.spec, .note { transition: filter var(--slow) var(--ease); }
+
+/* ── Plates (generated concrete photographs) ────────────────────────── */
+
+.plate { position: absolute; inset: 0; }
+.plate__grain { opacity: 0.5; mix-blend-mode: overlay; pointer-events: none; }
+
+/* ── Elsewhere — outbound links ─────────────────────────────────────── */
+
+.links-sheet {
+  max-width: var(--shell);
+  margin: 0 auto;
+  border-inline: var(--seam-w) solid var(--rule);
+  border-bottom: var(--seam-w) solid var(--rule);
+  background: linear-gradient(180deg, var(--slab-0), var(--slab-1));
+}
+
+.links-sheet__head {
+  padding: clamp(28px, 4vw, 54px) var(--gutter) clamp(18px, 2.4vw, 28px);
+  border-bottom: var(--seam-w) solid var(--rule);
+}
+.links-sheet__title { font-size: clamp(1.5rem, 3.2vw, 2.3rem); color: var(--bone); }
+.links-sheet__blurb {
+  margin-top: 9px;
+  max-width: 56ch;
+  color: var(--bone-dim);
+  font-size: 0.95rem;
+}
+
+.link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 272px), 1fr));
+  gap: var(--seam-w);
+  background: var(--seam-strong);
+}
+
+.linkcard {
+  --g: 0.2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--slab-1);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background var(--fast) var(--ease);
+}
+.linkcard:hover { background: var(--slab-2); }
+
+.linkcard__preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--slab-2);
+  border-bottom: var(--seam-w) solid var(--rule);
+}
+.linkcard__preview .plate {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Monogram sits under the favicon — if the favicon never arrives, this is
+   what you see, so a dead link still looks deliberate. */
+.linkcard__mark {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-ui);
+  font-weight: 900;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  letter-spacing: -0.04em;
+  color: var(--bone);
+  opacity: 0.92;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.55);
+}
+
+.linkcard__favicon {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  /* Held back to concrete until you engage with it. */
+  filter: grayscale(1) contrast(1.2) brightness(1.15);
+  transition: filter var(--slow) var(--ease), scale var(--slow) var(--ease);
+}
+.linkcard:hover .linkcard__favicon { filter: none; scale: 1.1; }
+
+.linkcard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  padding: 14px 16px 18px;
+}
+
+.linkcard__domain {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--moss-lit);
+}
+.linkcard__title {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 1.08rem;
+  letter-spacing: -0.02em;
+  color: var(--bone);
+}
+.linkcard__handle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--bone-faint);
+}
+.linkcard__desc {
+  margin-top: 4px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+.linkcard__go {
+  margin-top: auto;
+  padding-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+  transition: color var(--fast) var(--ease);
+}
+.linkcard:hover .linkcard__go { color: var(--moonlight); }
+.linkcard:hover .linkcard__go .arrow { translate: 3px -3px; }
+.linkcard__go .arrow { display: inline-block; transition: translate var(--fast) var(--ease); }
+
+/* The same growth rules as the sheet, one size down. */
+.linkcard__moss,
+.linkcard__tuft { position: absolute; z-index: 3; pointer-events: none; left: -6%; right: -6%; }
+.linkcard__moss {
+  bottom: -8%;
+  height: calc(6% + var(--g) * 30%);
+  background: linear-gradient(to top, var(--moss-deep), var(--moss-mid) 62%, var(--moss-lit));
+  border-radius: 48% 52% 0 0 / 84% 76% 0 0;
+  transition: translate var(--slow) var(--ease);
+}
+.linkcard__tuft {
+  bottom: -5%;
+  height: calc(3% + var(--g) * 16%);
+  background: linear-gradient(to top, var(--moss-mid), var(--moss-bright));
+  border-radius: 58% 42% 0 0 / 92% 86% 0 0;
+  opacity: calc(0.3 + var(--g) * 0.7);
+  transition: translate var(--slow) var(--ease), opacity var(--slow) var(--ease);
+}
+.linkcard:hover .linkcard__moss { translate: 0 52%; }
+.linkcard:hover .linkcard__tuft { translate: 0 62%; opacity: 0.2; }
+
+/* ── Colophon ───────────────────────────────────────────────────────── */
+
+.colophon {
+  position: relative;
+  background: linear-gradient(180deg, var(--slab-0), var(--env-0));
+  border-top: var(--seam-w) solid var(--rule);
+}
+
+.colophon__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 3.4vw, 44px);
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 84px) var(--gutter) clamp(30px, 4vw, 52px);
+}
+@media (min-width: 760px)  { .colophon__inner { grid-template-columns: 1fr 1.3fr 1fr; } }
+
+.colophon__head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--moss-lit);
+  margin-bottom: 14px;
+}
+
+.colophon__text { font-size: 0.92rem; color: var(--bone-dim); max-width: 46ch; }
+
+.links li + li { margin-top: 8px; }
+.links a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--seam-strong);
+  padding-bottom: 2px;
+  transition: border-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.links a:hover { border-color: var(--moonlight); }
+
+.specs > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.specs dt { color: var(--bone-faint); }
+.specs dd { color: var(--bone-dim); }
+
+.colophon__rule {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 16px var(--gutter) clamp(26px, 4vw, 44px);
+  border-top: var(--seam-w) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--bone-faint);
+}
+
+/* ── Overgrowth ─────────────────────────────────────────────────────── */
+
+.overgrowth {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+.overgrowth svg { width: 100%; height: 100%; display: block; }
+
+.vine__stem {
+  fill: none;
+  stroke: var(--moss-deep);
+  stroke-linecap: round;
+}
+.vine__leaf {
+  fill: var(--moss-mid);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.vine__leaf--lit { fill: var(--moss-lit); }
+
+.vine { animation: sway 9s ease-in-out infinite alternate; transform-origin: top center; }
+.vine--b { animation-duration: 12s; animation-delay: -3s; }
+.vine--c { animation-duration: 15s; animation-delay: -7s; }
+
+@keyframes sway {
+  from { rotate: -0.9deg; }
+  to   { rotate: 0.9deg; }
+}
+
+.spore {
+  fill: var(--moss-bright);
+  animation: drift linear infinite;
+}
+
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.75; }
+  90%  { opacity: 0.35; }
+  to   { transform: translate3d(28px, -140px, 0); opacity: 0; }
+}
+
+/* ── Lightbox ───────────────────────────────────────────────────────── */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 40px);
+}
+.lightbox[hidden] { display: none; }
+
+.lightbox__scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--env-0) 88%, transparent);
+  backdrop-filter: blur(7px);
+  animation: fade var(--fast) var(--ease);
+}
+@keyframes fade { from { opacity: 0; } }
+
+.lightbox__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  width: min(1040px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  background: var(--slab-1);
+  border: var(--seam-w) solid var(--seam-strong);
+  box-shadow: var(--shadow-plate);
+  animation: rise var(--slow) var(--ease);
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+@media (min-width: 880px) {
+  .lightbox__panel { grid-template-columns: 1.05fr 1fr; overflow: hidden; }
+}
+
+.lightbox__media {
+  position: relative;
+  min-height: 240px;
+  background: var(--slab-2);
+  border-bottom: var(--seam-w) solid var(--rule);
+}
+@media (min-width: 880px) {
+  .lightbox__media { border-bottom: 0; border-right: var(--seam-w) solid var(--rule); }
+}
+.lightbox__media svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.lightbox__body {
+  padding: clamp(22px, 3vw, 38px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+}
+
+.lightbox__frame {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--moss-lit);
+}
+.lightbox__title { font-size: clamp(1.4rem, 2.8vw, 2rem); color: var(--bone); }
+.lightbox__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+.lightbox__text { color: var(--bone-dim); font-size: 0.96rem; }
+.lightbox__text p + p { margin-top: 0.85em; }
+
+.lightbox__nav {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: var(--seam-w) solid var(--rule);
+}
+.lightbox__nav button {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--slab-2);
+  border: var(--seam-w) solid var(--seam-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease), scale var(--fast) var(--ease);
+}
+.lightbox__nav button:hover { background: var(--slab-3); color: var(--bone); }
+.lightbox__nav button:active { scale: 0.96; }
+
+.lightbox__close {
+  position: absolute;
+  top: 10px; right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px; height: 40px;
+  background: var(--slab-0);
+  border: var(--seam-w) solid var(--seam-strong);
+  color: var(--bone-dim);
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease), scale var(--fast) var(--ease);
+}
+.lightbox__close:hover { background: var(--slab-3); color: var(--bone); }
+.lightbox__close:active { scale: 0.96; }
+.lightbox__close svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+body.is-locked { overflow: hidden; }
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 999px) {
+  .rail__cell--hide { display: none; }
+  .sheet { border-inline: 0; }
+  .filters__inner { border-left: 0; }
+  .links-sheet { border-inline: 0; }
+}
+
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .wordmark__text { font-size: clamp(2.2rem, 13.4vw, 4.4rem); }
+  .frame { aspect-ratio: 4 / 5; }
+  .filter { min-height: 48px; padding: 0 13px; font-size: 11px; }
+  .lightbox { padding: 0; }
+  .lightbox__panel { width: 100%; height: 100%; max-height: 100%; }
+  .lightbox__media { min-height: 200px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .vine, .spore { animation: none; }
+  .spore { opacity: 0.4; }
+}

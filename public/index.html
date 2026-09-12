@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>typocasual — a structure, left out in the weather</title>
+<meta name="description" content="A contact sheet. A brutalist structure, photographed and slowly reclaimed. Every frame printed at the same size; nothing ranked.">
+<meta name="theme-color" content="#06110f">
+<link rel="canonical" href="https://typotypocasual.victroyarroyo.workers.dev/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://typotypocasual.victroyarroyo.workers.dev/">
+<meta property="og:site_name" content="typocasual">
+<meta property="og:image" content="https://typotypocasual.victroyarroyo.workers.dev/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="typocasual — a structure, left out in the weather">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://typotypocasual.victroyarroyo.workers.dev/og.jpg">
+<meta name="twitter:title" content="typocasual">
+<meta name="twitter:description" content="A contact sheet, reclaimed.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "typocasual",
+  "url": "https://typotypocasual.victroyarroyo.workers.dev/",
+  "description": "A contact sheet. A brutalist structure, photographed and slowly reclaimed. Every frame printed at the same size; nothing ranked."
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..600&family=Epilogue:wght@400..900&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,400..700&family=Atkinson+Hyperlegible+Mono:wght@200..700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<a class="skip" href="#sheet">Skip to frames</a>
+
+<!-- ── SVG filter + gradient definitions ─────────────────────────────── -->
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- Roughens any edge into something grown rather than drawn. -->
+    <filter id="overgrown" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.014 0.02" numOctaves="4" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="overgrown-fine" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.07" numOctaves="3" seed="19" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+
+    <linearGradient id="mossBank" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#4f6b33"/>
+      <stop offset="45%"  stop-color="#33481f"/>
+      <stop offset="100%" stop-color="#131f0e"/>
+    </linearGradient>
+    <linearGradient id="mossBankLit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#8fae56"/>
+      <stop offset="60%"  stop-color="#5b7a34"/>
+      <stop offset="100%" stop-color="#2c3f1b"/>
+    </linearGradient>
+    <radialGradient id="dapple" cx="50%" cy="0%" r="80%">
+      <stop offset="0%"   stop-color="#e6d58f" stop-opacity=".30"/>
+      <stop offset="100%" stop-color="#e6d58f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="weathering" aria-hidden="true"></div>
+
+<!-- ── Masthead ──────────────────────────────────────────────────────── -->
+<header class="masthead">
+
+  <div class="rail">
+    <span class="rail__cell">Contact sheet</span>
+    <span class="rail__cell">typocasual</span>
+    <span class="rail__cell rail__cell--hide">Frames&nbsp;<b id="frame-count">—</b></span>
+    <span class="rail__cell rail__cell--hide">Rev&nbsp;<b>2026-09-12</b></span>
+    <button class="rail__cell rail__cell--btn" id="theme-toggle" type="button" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span><span id="theme-label">Moonlit</span>
+    </button>
+  </div>
+
+  <div class="masthead__body">
+    <p class="kicker">Selected frames</p>
+
+    <h1 class="wordmark">
+      <span class="wordmark__text">typocasual</span>
+      <svg class="squiggle" viewBox="0 0 1000 26" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path class="squiggle__path" d="M2 18 q22 -13 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0"/>
+      </svg>
+      <span class="sr-only">— spelled wrong on purpose</span>
+    </h1>
+
+    <p class="tagline">a structure, left out in the weather</p>
+
+    <div class="masthead__cols">
+      <p class="lede">
+        Every frame is printed at the same size. The sheet does not rank the work —
+        it lays it out, and lets the weather in.
+      </p>
+      <p class="lede lede--quiet">
+        Twelve plates, four typefaces, four cards. Read left to right and the structure
+        gives way: the first frames are bare concrete, the last are barely legible
+        as architecture.
+      </p>
+    </div>
+
+    <blockquote class="epigraph">
+      <p>Concrete was an argument about permanence. Moss is a shorter argument, and it is winning.</p>
+    </blockquote>
+  </div>
+</header>
+
+<!-- ── Filters ───────────────────────────────────────────────────────── -->
+<nav class="filters" aria-label="Filter frames">
+  <div class="filters__inner" role="group" aria-label="Filter by state">
+    <!-- filled by app.js -->
+  </div>
+  <p class="filters__note" id="filters-note" role="status" aria-live="polite"></p>
+</nav>
+
+<!-- ── Contact sheet ─────────────────────────────────────────────────── -->
+<main id="sheet" class="sheet" aria-label="Contact sheet">
+  <noscript>
+    <p class="nojs">This sheet is rendered from <code>/data.json</code> — turn JavaScript on to see it.</p>
+  </noscript>
+</main>
+
+<!-- ── Elsewhere: outbound links ─────────────────────────────────────── -->
+<section class="links-sheet" id="links" aria-labelledby="links-head">
+  <header class="links-sheet__head">
+    <h2 class="links-sheet__title" id="links-head">Elsewhere</h2>
+    <p class="links-sheet__blurb" id="links-blurb"></p>
+  </header>
+  <div class="link-grid" id="link-grid"></div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────────── -->
+<footer class="colophon">
+  <div class="colophon__inner">
+    <div class="colophon__block">
+      <h2 class="colophon__head">The sheet</h2>
+      <dl class="specs">
+        <div><dt>Frames</dt><dd id="cf-frames">—</dd></div>
+        <div><dt>Plates</dt><dd id="cf-plates">—</dd></div>
+        <div><dt>Type</dt><dd id="cf-specs">—</dd></div>
+        <div><dt>Cards</dt><dd id="cf-notes">—</dd></div>
+      </dl>
+    </div>
+    <div class="colophon__block">
+      <h2 class="colophon__head">Colophon</h2>
+      <p class="colophon__text">
+        Set in Lora, Epilogue and Atkinson Hyperlegible — the Typocasual Forest system.
+        Printed on a Cloudflare Worker. Growing at roughly a millimetre a year, which is
+        faster than the concrete is aging.
+      </p>
+    </div>
+    <div class="colophon__block">
+      <h2 class="colophon__head">Status</h2>
+      <dl class="specs">
+        <div><dt>Structure</dt><dd>holding</dd></div>
+        <div><dt>Growth</dt><dd>unmanaged</dd></div>
+        <div><dt>Weather</dt><dd>ongoing</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="colophon__rule"><span class="squiggle-word">typocasual</span> — the red line stays.</p>
+</footer>
+
+<!-- ── Overgrowth: vines, drawn at runtime ───────────────────────────── -->
+<div class="overgrowth" aria-hidden="true">
+  <svg id="overgrowth" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <g class="overgrowth__bank" filter="url(#overgrown)">
+      <path d="M-40 940 L-40 792 Q40 746 118 776 T286 754 Q366 716 452 764 T618 742 Q700 702 792 758 T962 738 Q1046 700 1136 754 T1310 730 Q1392 700 1486 758 T1660 740 L1660 940 Z"
+            fill="url(#mossBank)"/>
+    </g>
+    <g class="overgrowth__bank-lit" filter="url(#overgrown-fine)">
+      <path d="M-40 940 L-40 852 Q60 812 152 842 T336 826 Q428 794 520 836 T686 818 Q778 788 872 830 T1042 812 Q1134 782 1228 826 T1400 806 Q1492 782 1586 828 T1660 812 L1660 940 Z"
+            fill="url(#mossBankLit)" opacity=".85"/>
+    </g>
+    <g class="overgrowth__creep" filter="url(#overgrown)">
+      <path d="M-40 300 Q60 330 96 402 T142 542 Q168 606 236 640 L236 700 Q120 660 78 566 T-40 420 Z" fill="#22351a" opacity=".9"/>
+      <path d="M1660 240 Q1560 286 1522 372 T1478 520 Q1452 588 1382 622 L1382 690 Q1502 646 1544 548 T1660 356 Z" fill="#22351a" opacity=".9"/>
+    </g>
+    <g id="vines"></g>
+    <g id="spores"></g>
+  </svg>
+</div>
+
+<!-- ── Lightbox ──────────────────────────────────────────────────────── -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" hidden>
+  <div class="lightbox__scrim" data-close></div>
+  <div class="lightbox__panel" role="document">
+    <button class="lightbox__close" type="button" data-close aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+    <div class="lightbox__media" id="lb-media"></div>
+    <div class="lightbox__body">
+      <p class="lightbox__frame" id="lb-frame"></p>
+      <h2 class="lightbox__title" id="lb-title"></h2>
+      <p class="lightbox__meta" id="lb-meta"></p>
+      <div class="lightbox__text" id="lb-text"></div>
+      <div class="lightbox__nav">
+        <button type="button" id="lb-prev">← Previous frame</button>
+        <button type="button" id="lb-next">Next frame →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
