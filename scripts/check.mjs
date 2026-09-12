@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates public/data.json against data.schema.json, then runs the
+ * Validates public/data.json against public/data.schema.json, then runs the
  * semantic rules the schema cannot express.
  *
  * Runs in CI before every deploy, so a malformed edit cannot ship.
@@ -16,7 +16,7 @@ import { renderLlms } from './llms.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = resolve(ROOT, 'public/data.json');
-const SCHEMA = resolve(ROOT, 'data.schema.json');
+const SCHEMA = resolve(ROOT, 'public/data.schema.json');
 
 /** Growth bands. These are the contract for `stage`; keep in sync with AGENTS.md. */
 const BANDS = [
@@ -261,7 +261,7 @@ if (warnings.length) {
 if (errors.length) {
   console.error(`\n✗ ${rel} failed validation — ${errors.length} error(s)\n`);
   for (const e of errors) console.error(`   ${e}`);
-  console.error('\n   Schema: data.schema.json   Guide: AGENTS.md\n');
+  console.error('\n   Schema: public/data.schema.json   Guide: AGENTS.md\n');
   process.exit(1);
 }
 

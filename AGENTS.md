@@ -19,7 +19,7 @@ the deploy if it fails.
 | File | Role |
 | --- | --- |
 | `public/data.json` | **All content.** Frames, filters, outbound links. This is the only file most edits touch. |
-| `data.schema.json` | The content contract: types, enums, required fields, growth ranges. |
+| `public/data.schema.json` | The content contract: types, enums, required fields, growth ranges. Published, so `/data.schema.json` resolves for agents. |
 | `scripts/check.mjs` | Validates `data.json` against the schema plus semantic rules the schema cannot express. |
 | `public/index.html` | Page structure, masthead copy, SVG filter defs, lightbox shell. |
 | `public/styles.css` | All styling. Tokens at the top, then components, then responsive. |

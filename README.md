@@ -28,11 +28,12 @@ npm run deploy   # check, then deploy
 **All content lives in one file: [`public/data.json`](public/data.json).** Add an object to
 `items` and it becomes a frame. Add one to `links` and it becomes a link card.
 
-The shape is defined by [`data.schema.json`](data.schema.json) and enforced by
+The shape is defined by [`public/data.schema.json`](public/data.schema.json) and enforced by
 `npm run check`, which runs in CI before every deploy — so a malformed edit fails the build
 instead of shipping a broken sheet. It validates the schema, plus the rules the schema
 cannot express: that `stage` agrees with `growth`, that plate seeds are unique, that no
-filter is dead, and that every element `app.js` looks up still exists in `index.html`.
+filter is dead, that `llms.txt` is in sync, and that every element `app.js` looks up still
+exists in `index.html`.
 
 **Read [`AGENTS.md`](AGENTS.md) before editing.** It is the contract: the invariants that
 break the page, the design system's source of truth, and how to verify a change. It is
@@ -46,11 +47,11 @@ public/
   styles.css              all styling — tokens, components, responsive
   app.js                  frame + link rendering, plate generator, vines, lightbox
   data.json               ← every frame, filter and link. The only file most edits touch.
+  data.schema.json        content contract (published so agents can fetch it)
   llms.txt                generated from data.json — run `npm run sync`
   favicon.svg
   og.jpg                  1200x630 link preview — run `swift scripts/make-og.swift public/og.jpg`
   apple-touch-icon.png
-data.schema.json          content contract
 scripts/
   check.mjs               validation, run by CI
   sync.mjs                regenerates llms.txt

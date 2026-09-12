@@ -1,4 +1,5 @@
 {
+  "$schema": "./data.schema.json",
   "meta": {
     "title": "typocasual",
     "tagline": "a structure, left out in the weather",
