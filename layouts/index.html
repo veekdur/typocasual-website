@@ -1,10 +1,7 @@
 {{ define "main" }}
 
-<!-- ── Masthead ──────────────────────────────────────────────────────── -->
 <header class="masthead">
   <div class="masthead__body">
-    <p class="kicker">Selected frames</p>
-
     <h1 class="wordmark">
       <span class="wordmark__text">typocasual</span>
       <svg class="squiggle" viewBox="0 0 1000 26" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -14,25 +11,10 @@
     </h1>
 
     <p class="tagline">{{ site.Params.tagline }}</p>
-
-    <div class="masthead__cols">
-      <p class="lede">
-        Every frame is printed at the same size. The sheet does not rank the work —
-        it lays it out, and lets the weather in.
-      </p>
-      <p class="lede lede--quiet">
-        The structure is concrete. The growth is not decoration: it is the only thing
-        on this page that is still changing.
-      </p>
-    </div>
-
-    <blockquote class="epigraph">
-      <p>Concrete was an argument about permanence. Moss is a shorter argument, and it is winning.</p>
-    </blockquote>
   </div>
 </header>
 
-{{- /* The vault's front page, kept in content/_index.md. Edit it there, not here. */ -}}
+{{- /* The vault's front page, kept in content/_index.md. Edit it there. */ -}}
 {{- with .Content }}
 <section class="welcome" aria-label="Welcome">
   <div class="welcome__inner">
@@ -41,32 +23,26 @@
 </section>
 {{- end }}
 
-<!-- ── Filters ───────────────────────────────────────────────────────── -->
-<nav class="filters" aria-label="Filter frames">
-  <div class="filters__inner" role="group" aria-label="Filter by state">
-    <!-- filled by app.js -->
+<section class="frames" aria-labelledby="frames-title">
+  <div class="frames__head">
+    <h2 class="frames__title" id="frames-title">{{ partial "sprig.html" (dict "class" "sprig--soft") }}</h2>
+    <p class="frames__blurb" id="frames-blurb"></p>
   </div>
-  <p class="filters__note" id="filters-note" role="status" aria-live="polite"></p>
-</nav>
 
-<!-- ── Contact sheet ─────────────────────────────────────────────────── -->
-<main id="sheet" class="sheet" aria-label="Contact sheet">
-  <noscript>
-    <p class="nojs">This sheet is rendered from <code>/data.json</code> — turn JavaScript on to see it.</p>
-  </noscript>
-</main>
+  <div class="frame-grid" id="frame-grid">
+    <noscript>
+      <p class="frame">The frames are rendered from <code>/data.json</code>.</p>
+    </noscript>
+  </div>
+</section>
 
-<!-- ── Elsewhere: outbound links ─────────────────────────────────────── -->
-<section class="links-sheet" id="links" aria-labelledby="links-head">
-  <header class="links-sheet__head">
-    <h2 class="links-sheet__title" id="links-head">Elsewhere</h2>
-    <p class="links-sheet__blurb" id="links-blurb"></p>
-  </header>
+<section class="links" aria-labelledby="links-title">
+  <div class="links__head">
+    <h2 class="links__title" id="links-title">{{ partial "sprig.html" (dict "class" "sprig--soft") }}</h2>
+    <p class="links__blurb" id="links-blurb"></p>
+  </div>
+
   <div class="link-grid" id="link-grid"></div>
 </section>
 
-{{ end }}
-
-{{ define "modals" }}
-{{ partial "lightbox.html" . }}
 {{ end }}

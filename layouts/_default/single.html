@@ -1,6 +1,5 @@
 {{ define "main" }}
 {{- $seed := .Params.seed | default 1 -}}
-{{- $growth := .Params.growth | default 0.25 -}}
 
 <article class="essay" id="main">
   <div class="essay__grid">
@@ -11,7 +10,7 @@
           <img src="{{ . | relURL }}" alt="{{ $.Params.imageAlt | default "" }}" loading="eager" decoding="async">
         {{- else }}
           {{/* No image supplied, so app.js draws a concrete plate from the seed. */}}
-          <div data-plate-seed="{{ $seed }}" data-plate-growth="{{ $growth }}"></div>
+          <div data-plate-seed="{{ $seed }}"></div>
         {{- end }}
       </div>
       {{- with .Params.caption }}
@@ -24,10 +23,6 @@
         <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02.01.2006" }}</time>
         <span aria-hidden="true">·</span>
         <span>{{ .ReadingTime }} min</span>
-        {{- with .Params.growth }}
-        <span aria-hidden="true">·</span>
-        <span>Growth {{ printf "%.0f%%" (mul . 100) }}</span>
-        {{- end }}
       </p>
 
       <h1 class="essay__title">{{ .Title }}</h1>

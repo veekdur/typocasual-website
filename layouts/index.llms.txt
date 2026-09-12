@@ -1,46 +1,34 @@
 {{- $sheet := os.ReadFile "static/data.json" | transform.Unmarshal -}}
-{{- $items := $sheet.items -}}
+{{- $frames := $sheet.frames -}}
 {{- $links := $sheet.links -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
-
-{{- $plates := 0 -}}{{- $specs := 0 -}}{{- $notes := 0 -}}
-{{- range $items -}}
-  {{- if eq .kind "plate" }}{{ $plates = add $plates 1 }}{{ end -}}
-  {{- if eq .kind "spec" }}{{ $specs = add $specs 1 }}{{ end -}}
-  {{- if eq .kind "note" }}{{ $notes = add $notes 1 }}{{ end -}}
-{{- end -}}
 # typocasual
 
-> {{ $sheet.meta.blurb }}
+> {{ site.Params.description }}
 
-A static site served by a Cloudflare Worker: a contact sheet of {{ len $items }} frames
-({{ $plates }} generated concrete plates, {{ $specs }} type specimens, {{ $notes }} text cards)
-and {{ len $posts }} {{ cond (eq (len $posts) 1) "essay" "essays" }}. No server-side rendering, no CMS, no database.
+A static site served by a Cloudflare Worker. The front page is {{ len $frames }} frames, one
+typeface each, showing why the face is used and where it appears. Behind it are
+{{ len $posts }} {{ cond (eq (len $posts) 1) "essay" "essays" }}. No server-side rendering, no CMS,
+no database, no build step beyond Hugo.
 
 Tagline: {{ site.Params.tagline }}
 
 ## Machine-readable
 
-- [data.json]({{ "/data.json" | absURL }}) — every frame, filter and outbound link. The source of truth for the sheet.
+- [data.json]({{ "/data.json" | absURL }}) — the frames and the outbound links. The source of truth for the front page.
 - [data.schema.json]({{ "/data.schema.json" | absURL }}) — JSON Schema describing the shape of data.json.
 - [Essays]({{ "/posts/" | absURL }}) — longer pieces, one Markdown file each.
 - [AGENTS.md](https://github.com/veekdur/typocasual-website/blob/main/AGENTS.md) — how to edit this site.
+- [DESIGN.md](https://github.com/veekdur/typocasual-website/blob/main/DESIGN.md) — the design rules and their reasons.
 
-## A note on `growth`
+## The type
 
-Every frame carries a `growth` value from 0 to 1. It is this site's own concept: how long
-the frame has been out in the weather, not a rating or a ranking. It drives how much moss
-covers the frame — 0 is bare concrete, 1 is buried. The same value appears on essays.
-Frames are filtered by `kind`: {{ range $i, $f := $sheet.filters }}{{ if $i }}, {{ end }}`{{ $f.id }}`{{ end }}.
+Each frame is one typeface. The specimen is live text, not an image.
 
-## Frames
-
-| # | Title | Kind | Year | Growth |
+| # | Role | Face | Weights | Why it is used |
 | --- | --- | --- | --- | --- |
-{{ range $i, $item := $items -}}
-{{- $band := "bare" -}}
-{{- if gt $item.growth 0.67 }}{{ $band = "consumed" }}{{ else if gt $item.growth 0.34 }}{{ $band = "encroaching" }}{{ end -}}
-| {{ printf "%03d" (add $i 1) }} | {{ $item.title }} | {{ $item.kind }} | {{ $item.year | default "—" }} | {{ printf "%.2f" $item.growth }} ({{ $band }}) |
+{{ range $i, $f := $frames -}}
+| {{ printf "%02d" (add $i 1) }} | {{ $f.role }} | {{ $f.name }} | {{ $f.weights | default "—" }} | {{ $f.why }} |
 {{ end }}
 ## Essays
 

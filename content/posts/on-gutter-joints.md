@@ -3,7 +3,6 @@ title: "On gutter joints"
 date: 2026-07-02
 description: "A joint that failed is a joint that became a bed."
 seed: 102
-growth: 0.5
 caption: "Gutter detail, 2024. Where it starts."
 ---
 

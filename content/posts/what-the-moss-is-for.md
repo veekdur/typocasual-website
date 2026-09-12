@@ -3,7 +3,6 @@ title: "What the moss is for"
 date: 2026-08-14
 description: "Concrete was an argument about permanence. The argument did not hold."
 seed: 101
-growth: 0.15
 caption: "South elevation, 2025. One hour before the shadow line reached the third floor."
 ---
 

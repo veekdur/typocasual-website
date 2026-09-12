@@ -3,7 +3,7 @@
  * Validates static/data.json against static/data.schema.json, then runs the
  * semantic rules the schema cannot express.
  *
- * Runs in CI before every deploy, so a malformed edit cannot ship.
+ * Runs in CI before every build, so a malformed edit cannot ship.
  * No dependencies — the JSON Schema subset below covers what the schema uses.
  *
  *   node scripts/check.mjs
@@ -16,28 +16,21 @@ import { dirname, resolve, relative } from 'node:path';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = resolve(ROOT, 'static/data.json');
 const SCHEMA = resolve(ROOT, 'static/data.schema.json');
-
-/** Growth bands. These are the contract for `stage`; keep in sync with AGENTS.md. */
-const BANDS = [
-  { stage: 'bare',        max: 0.34 },
-  { stage: 'encroaching', max: 0.67 },
-  { stage: 'consumed',    max: Infinity },
-];
-const bandFor = (g) => BANDS.find((b) => g <= b.max).stage;
+const HEAD = resolve(ROOT, 'layouts/partials/head.html');
 
 const errors = [];
 const warnings = [];
 
 /* ── Load ─────────────────────────────────────────────────────────────── */
 
-const readJSON = (path) => {
+function readJSON(path) {
   try {
     return JSON.parse(readFileSync(path, 'utf8'));
   } catch (err) {
     console.error(`\n✗ Could not parse ${relative(ROOT, path)}\n  ${err.message}\n`);
     process.exit(1);
   }
-};
+}
 
 const data = readJSON(DATA);
 const schema = readJSON(SCHEMA);
@@ -151,47 +144,61 @@ function validate(value, rawNode, path) {
 
 validate(data, schema, '$');
 
-/* ── Semantic rules ───────────────────────────────────────────────────── */
+/* ── Fonts ────────────────────────────────────────────────────────────── */
 
-const items = Array.isArray(data.items) ? data.items : [];
+// Every face a frame claims to be must actually be requested by the fonts link.
+// A documented face that never loads silently renders as a fallback.
+const FONTS_URL = /https:\/\/fonts\.googleapis\.com\/css2\?([^"']+)/.exec(
+  readFileSync(HEAD, 'utf8'),
+)?.[1];
 
-items.forEach((item, i) => {
-  const at = `$.items[${i}] ("${item.title ?? 'untitled'}")`;
+const loadedFamilies = new Set();
+if (FONTS_URL) {
+  for (const m of FONTS_URL.matchAll(/family=([^&:]+)/g)) {
+    loadedFamilies.add(decodeURIComponent(m[1].replace(/\+/g, ' ')).trim());
+  }
+} else {
+  errors.push('layouts/partials/head.html: no fonts.googleapis.com link found');
+}
 
-  // stage must agree with growth, or the badge lies about the moss.
-  if (typeof item.growth === 'number' && item.stage) {
-    const expected = bandFor(item.growth);
-    if (item.stage !== expected) {
-      errors.push(
-        `${at}: stage "${item.stage}" disagrees with growth ${item.growth} ` +
-        `(that growth is in the "${expected}" band)`,
-      );
+/** The first family in a CSS stack, e.g. `"Lora", Georgia, serif` → `Lora`. */
+const firstFamily = (stack) => {
+  const quoted = /^\s*"([^"]+)"/.exec(stack);
+  if (quoted) return quoted[1];
+  return stack.split(',')[0].trim();
+};
+
+const frames = Array.isArray(data.frames) ? data.frames : [];
+const seenRoles = new Map();
+const seenNames = new Map();
+
+frames.forEach((frame, i) => {
+  const at = `$.frames[${i}] ("${frame.name ?? 'unnamed'}")`;
+
+  if (frame.role) {
+    if (seenRoles.has(frame.role))
+      errors.push(`${at}: role "${frame.role}" is already used by "${seenRoles.get(frame.role)}" — each face needs its own job`);
+    else seenRoles.set(frame.role, frame.name);
+  }
+
+  if (frame.name) {
+    if (seenNames.has(frame.name))
+      errors.push(`${at}: "${frame.name}" appears twice`);
+    else seenNames.set(frame.name, i);
+  }
+
+  if (frame.stack && frame.name) {
+    const lead = firstFamily(frame.stack);
+    if (lead !== frame.name) {
+      errors.push(`${at}: name is "${frame.name}" but the stack starts with "${lead}" — make them agree`);
+    }
+    if (!loadedFamilies.has(lead)) {
+      errors.push(`${at}: "${lead}" is not in the fonts link in layouts/partials/head.html, so the specimen renders in a fallback`);
     }
   }
-
-  // Two plates sharing a seed render as identical images.
-  if (item.kind === 'plate' && typeof item.seed === 'number') {
-    const clash = items.findIndex((o, j) => j < i && o.kind === 'plate' && o.seed === item.seed);
-    if (clash !== -1)
-      warnings.push(`${at}: seed ${item.seed} is already used by frame ${clash + 1} — the plates will look identical`);
-  }
 });
 
-const titles = new Map();
-items.forEach((item, i) => {
-  if (!item.title) return;
-  if (titles.has(item.title))
-    warnings.push(`$.items[${i}]: duplicate title "${item.title}" (also frame ${titles.get(item.title) + 1})`);
-  else titles.set(item.title, i);
-});
-
-// A filter that matches nothing renders a dead button.
-for (const filter of data.filters ?? []) {
-  if (filter.id === 'all') continue;
-  const hits = items.filter((i) => i.kind === filter.id || i.stage === filter.id).length;
-  if (hits === 0)
-    warnings.push(`$.filters: "${filter.id}" matches no frame — the button will show 00 and an empty sheet`);
-}
+/* ── Links ────────────────────────────────────────────────────────────── */
 
 for (const [i, link] of (data.links ?? []).entries()) {
   if (typeof link.url === 'string') {
@@ -203,49 +210,10 @@ for (const [i, link] of (data.links ?? []).entries()) {
   }
 }
 
-/* ── DOM contract ─────────────────────────────────────────────────────── */
-
-// Every element app.js looks up by id must exist somewhere under layouts/. A
-// renamed id is the most common way an edit breaks a page, and it fails
-// silently in the browser, so it is worth a hard check here.
-const APP_SRC = readFileSync(resolve(ROOT, 'static/app.js'), 'utf8');
-
-const layoutFiles = [];
-(function walk(dir) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = resolve(dir, entry.name);
-    if (entry.isDirectory()) walk(full);
-    else if (entry.name.endsWith('.html')) layoutFiles.push(full);
-  }
-})(resolve(ROOT, 'layouts'));
-
-const declaredIds = new Set();
-for (const file of layoutFiles) {
-  for (const m of readFileSync(file, 'utf8').matchAll(/\bid="([^"]+)"/g)) {
-    declaredIds.add(m[1]);
-  }
-}
-
-// Created by app.js at runtime, so not expected in the markup.
-const RUNTIME_IDS = new Set(['ld-links']);
-
-const lookedUp = new Set([
-  ...[...APP_SRC.matchAll(/\$\(\s*'#([A-Za-z0-9_-]+)'/g)].map((m) => m[1]),
-  ...[...APP_SRC.matchAll(/getElementById\(\s*'([A-Za-z0-9_-]+)'/g)].map((m) => m[1]),
-  // fillCounts() targets ids through a helper: set('cf-frames', n)
-  ...[...APP_SRC.matchAll(/set\(\s*'([A-Za-z0-9_-]+)'/g)].map((m) => m[1]),
-]);
-
-for (const id of lookedUp) {
-  if (!declaredIds.has(id) && !RUNTIME_IDS.has(id)) {
-    errors.push(`static/app.js looks up #${id}, but no template under layouts/ defines it`);
-  }
-}
-
 /* ── Essays ───────────────────────────────────────────────────────────── */
 
-// Essays share the plate generator with the sheet, so a repeated seed means two
-// different pages show the same photograph.
+// Essays get a generated plate, so a repeated seed means two essays show the
+// same image.
 const POSTS_DIR = resolve(ROOT, 'content/posts');
 const essays = existsSync(POSTS_DIR)
   ? readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md') && f !== '_index.md')
@@ -259,14 +227,9 @@ function frontMatter(file) {
   if (!block) return out;
   for (const line of block[1].split(/\r?\n/)) {
     const kv = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
-    if (kv) out[kv[1]] = kv[2].replace(/^["']|[ "']$/g, '').trim();
+    if (kv) out[kv[1]] = kv[2].replace(/^["']|["']$/g, '').trim();
   }
   return out;
-}
-
-const sheetSeeds = new Map();
-for (const item of items) {
-  if (item.kind === 'plate' && typeof item.seed === 'number') sheetSeeds.set(item.seed, item.title);
 }
 
 const essaySeeds = new Map();
@@ -278,27 +241,45 @@ for (const file of essays) {
 
   const seed = Number(fm.seed);
   if (Number.isFinite(seed)) {
-    if (sheetSeeds.has(seed)) {
-      warnings.push(`${at}: seed ${seed} is already frame "${sheetSeeds.get(seed)}" — the plates will look identical`);
-    } else if (essaySeeds.has(seed)) {
-      warnings.push(`${at}: seed ${seed} is already used by "${essaySeeds.get(seed)}"`);
-    }
+    if (essaySeeds.has(seed))
+      warnings.push(`${at}: seed ${seed} is already used by "${essaySeeds.get(seed)}" — the plates will look identical`);
     essaySeeds.set(seed, fm.title);
   } else {
     warnings.push(`${at}: no "seed", so the plate falls back to 1 and will repeat`);
   }
 
-  if (fm.growth !== undefined) {
-    const g = Number(fm.growth);
-    if (!Number.isFinite(g) || g < 0 || g > 1) {
-      errors.push(`${at}: growth must be between 0 and 1, got "${fm.growth}"`);
-    }
-  }
+  if (fm.draft === 'true') warnings.push(`${at}: marked draft, so it will not be published`);
+}
 
-  // Checked last: a draft still gets seed and growth validation, so scaffolding a
-  // post tells you about a colliding seed straight away rather than on publish.
-  if (fm.draft === 'true') {
-    warnings.push(`${at}: marked draft, so it will not be published`);
+/* ── DOM contract ─────────────────────────────────────────────────────── */
+
+// Every element app.js looks up by id must exist somewhere under layouts/.
+const APP_SRC = readFileSync(resolve(ROOT, 'static/app.js'), 'utf8');
+
+const layoutFiles = [];
+(function walk(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = resolve(dir, entry.name);
+    if (entry.isDirectory()) walk(full);
+    else if (entry.name.endsWith('.html')) layoutFiles.push(full);
+  }
+})(resolve(ROOT, 'layouts'));
+
+const declaredIds = new Set();
+for (const file of layoutFiles) {
+  for (const m of readFileSync(file, 'utf8').matchAll(/\bid="([^"]+)"/g)) declaredIds.add(m[1]);
+}
+
+const RUNTIME_IDS = new Set(['ld-links']);
+
+const lookedUp = new Set([
+  ...[...APP_SRC.matchAll(/\$\(\s*'#([A-Za-z0-9_-]+)'/g)].map((m) => m[1]),
+  ...[...APP_SRC.matchAll(/getElementById\(\s*'([A-Za-z0-9_-]+)'/g)].map((m) => m[1]),
+]);
+
+for (const id of lookedUp) {
+  if (!declaredIds.has(id) && !RUNTIME_IDS.has(id)) {
+    errors.push(`static/app.js looks up #${id}, but no template under layouts/ defines it`);
   }
 }
 
@@ -318,12 +299,10 @@ if (errors.length) {
   process.exit(1);
 }
 
-const count = (kind) => items.filter((i) => i.kind === kind).length;
 console.log(
   `\n✓ ${rel} is valid\n` +
-  `   frames ${items.length}  ·  plates ${count('plate')}  ·  type ${count('spec')}  ·  cards ${count('note')}\n` +
-  `   links  ${(data.links ?? []).length}\n` +
-  `   growth ${Math.min(...items.map((i) => i.growth)).toFixed(2)} → ${Math.max(...items.map((i) => i.growth)).toFixed(2)}\n` +
-  `   dom    ${lookedUp.size} id(s) resolved across ${layoutFiles.length} template(s)\n` +
-  `   essays ${essays.length}\n`,
+  `   frames ${frames.length}  ·  links ${(data.links ?? []).length}  ·  essays ${essays.length}\n` +
+  `   faces  ${[...seenNames.keys()].join(', ')}\n` +
+  `   loaded ${[...loadedFamilies].join(', ')}\n` +
+  `   dom    ${lookedUp.size} id(s) resolved across ${layoutFiles.length} template(s)\n`,
 );

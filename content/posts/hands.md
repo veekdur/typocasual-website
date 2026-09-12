@@ -3,7 +3,6 @@ title: "hands"
 date: 2026-07-12
 description: "My hands hurt. On typing, voice input, and work that keeps them moving."
 seed: 104
-growth: 0.55
 ---
 
 my hands hurt all the time

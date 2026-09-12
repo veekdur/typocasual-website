@@ -3,7 +3,6 @@ title: "Podium"
 date: 2026-05-19
 description: "The last frame, and the only one where you cannot tell there was a building."
 seed: 103
-growth: 0.92
 caption: "Podium, 2023. Fully returned. You would not know there was a building here."
 ---
 

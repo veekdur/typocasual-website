@@ -1,13 +1,20 @@
 # typocasual — owner manual
 
 This manual tells you how to add a post, change the front page, and publish the site.
-Read section 3 first. Read section 10 before you change a file.
+Read section 3 first. Read section 9 before you change a file.
+
+Other documents:
+
+- `DESIGN.md` — how the site must look, and the reason for each rule
+- `CONTEXT.md` — what the project is, what it is not, and the decisions behind it
+- `LEDGER.md` — the revision history
+- `AGENTS.md` — the same rules as this manual, written for a coding agent
 
 ## 1. Purpose
 
 The site has two parts.
 
-- The front page shows the contact sheet. The contact sheet is a grid of frames.
+- The front page shows six frames. Each frame shows one typeface.
 - The essay pages show long text. Each essay is one Markdown file.
 
 Hugo builds the site. Cloudflare supplies the site to the public.
@@ -18,7 +25,7 @@ You need these items:
 
 - Node.js, version 22 or later
 - Hugo, version 0.166 or later, extended edition
-- The `gh` command, for the deploy token in section 8
+- The `gh` command, for the deploy token in section 10
 
 Run this command to install Hugo:
 
@@ -88,11 +95,8 @@ title: "My post"
 date: 2026-07-02
 description: "One line. This line appears below the title."
 seed: 106
-growth: 0.5
 ---
 ```
-
-The table gives the purpose of each field.
 
 | Field | Purpose | Necessary |
 | --- | --- | --- |
@@ -100,15 +104,14 @@ The table gives the purpose of each field.
 | `date` | The sort order. The newest essay comes first. | Yes |
 | `description` | The line below the title. Also the summary in the index. | Yes |
 | `seed` | Selects the generated image. Section 5.3 gives the rules. | Yes |
-| `growth` | The moss quantity. Use a number from 0 to 1. | No |
 | `caption` | Small text below the image | No |
 | `image` | A real photograph. Section 5.4 gives the procedure. | No |
 | `draft` | Remove this line to publish the essay. | No |
 
 ### 5.3 Select a seed
 
-The site contains no photograph files for the frames and the essay images. The site
-calculates each image from a number. The number is the `seed`.
+The site contains no photograph files for the essay images. The site calculates each image
+from a number. The number is the `seed`.
 
 The same seed always gives the same image. Two essays with the same seed show the same
 image. Therefore, each seed must be different.
@@ -146,69 +149,56 @@ The site styles all of these items.
 
 The essay does not appear on the site while the line is present.
 
-## 6. Change the home intro
+## 6. Change the front page
 
-The text above the contact sheet comes from one file.
+Two files control the front page.
 
-1. Open `content/_index.md`.
-2. Change the text.
-3. Run `npm run check`.
+- `content/_index.md` — the introduction text, above the frames
+- `static/data.json` — the six frames and the link cards
 
-The file has no front matter fields. Write the text only.
+### 6.1 Change a frame
 
-## 7. Change the front page frames
+Each frame shows one typeface. Open `static/data.json` and find the `frames` list.
 
-The frames come from one file. The name of the file is `static/data.json`.
+```jsonc
+{
+  "role": "Interface",                    // The job. Must be different for each frame.
+  "name": "Fira Sans",                    // The family name.
+  "weights": "100–900 · variable",        // Shown under the name.
+  "sample": "Aa",                         // The large glyphs.
+  "specimen": "Frames · Essays · Sunlit", // The sample line.
+  "stack": "\"Fira Sans\", system-ui, sans-serif",  // A CSS font-family value.
+  "weight": 500,                          // The weight of the sample.
+  "why": "Drawn for small screen text.",  // One sentence.
+  "used": "The top rail, labels, buttons."// Where the face appears.
+}
+```
 
-The file has three lists:
+Two rules apply to a frame:
 
-- `filters` — the buttons above the grid
-- `items` — the frames in the grid
-- `links` — the cards below the grid
+1. The `name` must agree with the first family in the `stack`.
+2. The family must be loaded by the fonts link in `layouts/partials/head.html`.
 
-### 7.1 Add a frame
+`npm run check` examines both rules. The command stops the build if a rule fails.
 
-1. Copy one object in the `items` list.
-2. Change the values.
-3. Keep the commas correct.
+### 6.2 Add a font
+
+1. Open `layouts/partials/head.html`.
+2. Add the family to the `fonts.googleapis.com` link.
+3. Add a frame to the `frames` list in `static/data.json`.
 4. Run `npm run check`.
 
-Select the frame type from this table.
+The number of frames is the number of fonts. Add a frame for each new font.
 
-| `kind` | Result | Necessary fields |
-| --- | --- | --- |
-| `plate` | A generated concrete photograph | `seed` |
-| `spec` | A type specimen | `sample`, `stack`, `specimen` |
-| `note` | A text card | `body` |
+### 6.3 Change a link card
 
-All three types also need `kind`, `stage`, `growth`, and `title`.
-
-### 7.2 Add a link card
-
-1. Copy one object in the `links` list.
-2. Change the values.
+1. Find the `links` list in `static/data.json`.
+2. Copy one object and change the values.
 3. Make sure that the `url` value starts with `https://`.
 
 The site calculates the domain name and the small icon from the `url` value.
 
-### 7.3 Use the growth value
-
-The `growth` value is a number from 0 to 1. The value controls the moss on the frame.
-
-- `0` gives bare concrete.
-- `1` gives a fully covered frame.
-
-The `stage` field is the label for the number. The label must agree with the number.
-
-| `stage` | `growth` |
-| --- | --- |
-| `bare` | 0 to 0.34 |
-| `encroaching` | 0.34 to 0.67 |
-| `consumed` | more than 0.67 |
-
-If the label and the number disagree, `npm run check` stops the deploy.
-
-## 8. Publish the site
+## 7. Publish the site
 
 1. Run the check:
 
@@ -231,61 +221,41 @@ If the label and the number disagree, `npm run check` stops the deploy.
 
 GitHub builds the site and sends it to Cloudflare. The operation takes about one minute.
 
-**Important:** the automatic deploy needs a Cloudflare token. Section 12 gives the
+**Important:** the automatic deploy needs a Cloudflare token. Section 10 gives the
 procedure. Until you do that procedure, use `npm run deploy` in place of step 3.
 
-## 9. Understand the files
+## 8. Understand the files
 
 | Path | Purpose | Safe to change |
 | --- | --- | --- |
-| `content/_index.md` | The home intro | Yes |
+| `content/_index.md` | The home introduction | Yes |
 | `content/posts/*.md` | The essays | Yes |
 | `static/data.json` | The frames and the links | Yes |
 | `static/images/` | Your photographs | Yes |
 | `static/styles.css` | The colours and the layout | Yes, with care |
+| `DESIGN.md` | The design rules | Yes |
+| `CONTEXT.md` | The project context | Yes |
+| `LEDGER.md` | The revision history | Yes |
+| `README.md` | This manual | Yes |
 | `layouts/` | The page structure | No |
 | `scripts/check.mjs` | The check program | No |
 | `public/` | The built site | No |
 | `hugo.toml` | The site settings | No |
 | `wrangler.jsonc` | The Cloudflare settings | No |
-| `README.md` | This manual | Yes |
 | `AGENTS.md` | The rules for a coding agent | No |
 
-## 10. Obey these rules
+## 9. Obey these rules
 
 1. Run `npm run check` before you save a change.
 2. Do not change a file in `public/`. Hugo deletes the folder at each build.
-3. Give each seed a different number.
+3. Give each essay seed a different number.
 4. Do not correct the spelling of `typocasual`. The red line below the word is the logo.
 5. Do not copy the Obsidian vault to this site. The vault has a different web site.
-6. Change a colour in both theme blocks. The blocks are `[data-theme="dark"]` and
+6. Keep the moss small. Do not put moss on top of text. Read `DESIGN.md`, rule 1.
+7. Change a colour in both theme blocks. The blocks are `[data-theme="dark"]` and
    `[data-theme="light"]` in `static/styles.css`.
 
-## 11. Find the cause of a problem
-
-Run `npm run check` first. The command finds most problems. A `⚠` mark is a warning. A
-warning does not stop the deploy. A `✗` mark is an error. An error stops the deploy.
-
-| Message or symptom | Cause | Action |
-| --- | --- | --- |
-| `missing required field "seed"` | A plate has no seed. | Add a `seed` number to the frame. |
-| `must be one of "note" \| "spec" \| "plate"` | The `kind` value has a spelling error. | Correct the `kind` value. |
-| `seed 101 is already used by "..."` | Two essays have the same seed. | Change the seed number. |
-| `seed 101 is already frame "..."` | An essay and a frame have the same seed. | Change the seed number. |
-| `stage "bare" disagrees with growth 0.9` | The label and the number disagree. | Change the label or the number. Section 7.3 gives the table. |
-| `is not in data.schema.json — typo` | A field name has a spelling error. | Correct the field name. |
-| `matches no frame — the button will show 00` | A filter matches no frame. | Correct the filter `id`, or add a frame. |
-| `looks up #x, but no template defines it` | The code and the template disagree. | Stop. This is a fault in the code, not in your text. |
-| `front matter has no "title"` | An essay has no title. | Add the `title` field. |
-| `growth must be between 0 and 1` | The growth number is out of range. | Use a number from 0 to 1. |
-| `marked draft, so it will not be published` | The draft line is present. | This is usual. Delete `draft: true` to publish. |
-| The text is absent from the preview | The draft line is present, or the server is old. | Delete `draft: true`. Start `npm run dev` again. |
-| The image is the same on two pages | Two seeds are equal. | Change one seed number. |
-| `npm run check` reports a layout error | A file in `layouts/` changed. | Run `git diff layouts/`. Then run `git checkout -- layouts/` to undo the change. |
-| The site shows `404` after a deploy | The build failed, or the address is wrong. | Examine the GitHub Actions log. |
-| The deploy stops with `CLOUDFLARE_API_TOKEN` | The token is absent. | Do the procedure in section 12. |
-
-## 12. Set the Cloudflare token
+## 10. Set the Cloudflare token
 
 Do this procedure one time.
 
@@ -308,7 +278,30 @@ Do this procedure one time.
      --body 371b07f7e80f69e81b04a5ed7ca06fca
    ```
 
-## 13. Undo a change
+## 11. Find the cause of a problem
+
+Run `npm run check` first. The command finds most problems. A `⚠` mark is a warning. A
+warning does not stop the deploy. A `✗` mark is an error. An error stops the deploy.
+
+| Message or symptom | Cause | Action |
+| --- | --- | --- |
+| `missing required field "why"` | A frame has no reason sentence. | Add the `why` field. |
+| `missing required field "seed"` | An essay has no seed. | Add a `seed` number. |
+| `name is "X" but the stack starts with "Y"` | The name and the stack disagree. | Make the two values agree. |
+| `is not in the fonts link` | A frame names a font that is not loaded. | Add the family to `layouts/partials/head.html`. |
+| `role "X" is already used by "Y"` | Two frames have the same job. | Give each frame a different role. |
+| `seed 101 is already used by "..."` | Two essays have the same seed. | Change the seed number. |
+| `is not in data.schema.json — typo` | A field name has a spelling error. | Correct the field name. |
+| `looks up #x, but no template defines it` | The code and the template disagree. | Stop. This is a fault in the code, not in your text. |
+| `front matter has no "title"` | An essay has no title. | Add the `title` field. |
+| `marked draft, so it will not be published` | The draft line is present. | This is usual. Delete `draft: true` to publish. |
+| The image is the same on two pages | Two seeds are equal. | Change one seed number. |
+| The text is absent from the preview | The draft line is present, or the server is old. | Delete `draft: true`. Start `npm run dev` again. |
+| `npm run check` reports a layout error | A file in `layouts/` changed. | Run `git diff layouts/`. Then run `git checkout -- layouts/` to undo the change. |
+| The site shows `404` after a deploy | The build failed, or the address is wrong. | Examine the GitHub Actions log. |
+| The deploy stops with `CLOUDFLARE_API_TOKEN` | The token is absent. | Do the procedure in section 10. |
+
+## 12. Undo a change
 
 1. Run `git status`. The command shows the changed files.
 2. Run `git diff`. The command shows the change.
@@ -316,11 +309,13 @@ Do this procedure one time.
 
 A push is not permanent. Correct the file and push again.
 
-## 14. Get help
+## 13. Get help
 
 Use these sources:
 
 - `npm run check` — the fastest method to find a problem
+- `DESIGN.md` — the design rules and their reasons
+- `CONTEXT.md` — what the project is and what it is not
 - `AGENTS.md` — the same rules, written for a coding agent
 - `https://typotypocasual.victroyarroyo.workers.dev/llms.txt` — a machine-readable summary
 - `https://typotypocasual.victroyarroyo.workers.dev` — the live site

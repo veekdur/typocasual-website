@@ -11,7 +11,7 @@ disableKinds = ["taxonomy", "term"]
 
 [params]
   tagline = "a structure, left out in the weather"
-  description = "A contact sheet. A brutalist structure, photographed and slowly reclaimed. Every frame printed at the same size; nothing ranked."
+  description = "Six typefaces, one per frame, each with the reason it is used. A brutalist structure, slowly reclaimed."
   # The word typocasual is a deliberate misspelling; the red squiggle is the mark.
   ogImage = "/og.jpg"
 

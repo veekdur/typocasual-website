@@ -3,7 +3,6 @@ title: "typocasual title"
 date: 2026-07-04
 description: "Why the site is called typocasual, and why the red line under the name stays."
 seed: 105
-growth: 0.2
 ---
 
 #typocasual

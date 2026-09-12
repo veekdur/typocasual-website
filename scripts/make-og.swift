@@ -26,8 +26,8 @@ func rgb(_ hex: UInt32, _ alpha: CGFloat = 1) -> CGColor {
     )
 }
 
-let ENV_0: UInt32 = 0x0a1a16
-let ENV_1: UInt32 = 0x06110f
+let ENV_0: UInt32 = 0x091510
+let ENV_1: UInt32 = 0x0d1a12
 let BONE: UInt32 = 0xe7eee7
 let BONE_DIM: UInt32 = 0xa6b8aa
 let MOSS_LIT: UInt32 = 0x7d9c4a
@@ -203,23 +203,21 @@ func bankPath(amplitude: CGFloat, base: CGFloat) -> CGPath {
     return p
 }
 
-ctx.setFillColor(rgb(MOSS_DEEP, 0.97))
-ctx.addPath(bankPath(amplitude: 34, base: 96))
+// A thin moss edge along the bottom joint. Moss belongs in the seams, not
+// across the page, so this stays small on purpose.
+ctx.setFillColor(rgb(MOSS_DEEP, 0.85))
+ctx.addPath(bankPath(amplitude: 9, base: 26))
 ctx.fillPath()
 
-ctx.setFillColor(rgb(MOSS_MID, 0.95))
-ctx.addPath(bankPath(amplitude: 22, base: 58))
-ctx.fillPath()
-
-ctx.setFillColor(rgb(MOSS_BRIGHT, 0.62))
-ctx.addPath(bankPath(amplitude: 12, base: 28))
+ctx.setFillColor(rgb(MOSS_MID, 0.7))
+ctx.addPath(bankPath(amplitude: 6, base: 13))
 ctx.fillPath()
 
 // A few clumps so the edge is not a clean sine wave.
-for _ in 0..<26 {
-    let r = 4 + rand() * 13
+for _ in 0..<14 {
+    let r = 2 + rand() * 5
     let cx = rand() * CGFloat(W)
-    let cy = 20 + rand() * 78
+    let cy = 6 + rand() * 20
     ctx.setFillColor(rgb(rand() > 0.5 ? MOSS_MID : MOSS_DEEP, 0.5 + rand() * 0.4))
     ctx.fillEllipse(in: CGRect(x: cx, y: cy, width: r * 2, height: r * 1.35))
 }

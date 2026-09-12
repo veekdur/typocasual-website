@@ -1,205 +1,200 @@
 # AGENTS.md — working on typocasual
 
-A contact sheet plus an essay blog, built by Hugo and served as static assets by a
-Cloudflare Worker. Read this before editing; it is the contract.
+A personal site: six typeface frames on the front page, and a small blog behind them. Hugo
+builds it; a Cloudflare Worker serves the static output. Read this before editing.
+
+Read `DESIGN.md` before changing anything visual. It explains *why* the design is the way it
+is, and lists the things that were tried and removed.
 
 ## Commands
 
 ```bash
-npm install                 # once
-npm run check               # validate content — ALWAYS run after editing
-npm run build               # hugo → public/  (this is what gets deployed)
-npm run dev                 # build, then wrangler dev on http://localhost:8787
-npm run new -- posts/slug.md   # scaffold a new essay from archetypes/posts.md
-npm run deploy              # check, build, wrangler deploy
+npm install                     # once
+npm run check                   # validate content — ALWAYS run after editing
+npm run build                   # hugo → public/   (this is what gets deployed)
+npm run dev                     # build, then wrangler dev on http://localhost:8787
+npm run new -- posts/slug.md    # scaffold an essay from archetypes/posts.md
+npm run deploy                  # check, build, wrangler deploy
+npm run og                      # regenerate the link preview image
 ```
 
-`npm run check` must pass before committing. CI runs it before the build and the deploy,
-so a malformed edit fails there instead of shipping a broken page.
+`npm run check` must pass before committing. CI runs it before the build, so a malformed edit
+fails there instead of shipping a broken page.
 
 Requires Node 22+ and Hugo 0.166+ **extended** (`brew install hugo`).
 
-## The two halves
+## The shape of the site
 
 | | Front page | Essays |
 | --- | --- | --- |
-| What | The contact sheet — a grid of frames | Long-form posts, one Markdown file each |
+| What | Six frames, one typeface each | Long-form posts |
 | Content lives in | `static/data.json` | `content/posts/*.md` |
 | Template | `layouts/index.html` | `layouts/_default/single.html` |
 | Index | — | `layouts/_default/list.html` at `/posts/` |
 
-Everything else — the rail, the footer, the moss overlay, the filters and lightbox — is
-shared and comes from `layouts/partials/` and `layouts/_default/baseof.html`. Do not
-duplicate it into a page template.
+The home introduction is `content/_index.md`, rendered above the frames. The rail, footer,
+grain texture and sprig mark are partials and must not be duplicated into a page.
 
 ## Where things live
 
 | Path | Role |
 | --- | --- |
-| `static/data.json` | **The sheet's content.** Frames, filters, outbound links. Most sheet edits touch only this. |
+| `static/data.json` | **The frames and the outbound links.** Most front-page edits touch only this. |
 | `static/data.schema.json` | The shape of `data.json`. Published at `/data.schema.json`. |
-| `content/_index.md` | **The home intro**, above the sheet. Rendered via `{{ .Content }}` in `layouts/index.html`. |
+| `content/_index.md` | The home introduction. |
 | `content/posts/*.md` | **The essays.** One file per post, YAML front matter. |
-| `archetypes/posts.md` | The scaffold used by `npm run new`. |
 | `scripts/check.mjs` | Validation. Runs in CI. No dependencies. |
+| `DESIGN.md` | The design rules, and the measurements behind them. |
+| `CONTEXT.md` | What the project is, what it is not, the decisions. |
+| `LEDGER.md` | Revision history. **Append an entry for substantial changes.** |
+| `README.md` | The manual, written for the owner in ASD-STE100. |
 | `layouts/` | Hugo templates. `baseof.html` wraps every page. |
 | `static/styles.css` | All styling. Tokens first, then components, then responsive. |
-| `static/app.js` | Frame and link rendering, plate generation, vines, lightbox. |
-| `hugo.toml` | Site config, output formats (`llms.txt`), markdown settings. |
+| `static/app.js` | Frame and link rendering, plate generation, theme switch. |
+| `hugo.toml` | Site config and output formats. |
 | `wrangler.jsonc` | Worker name (`typotypocasual`) and the assets config. |
 | `public/` | **Build output. Gitignored. Never edit it.** |
 
-## Posting an essay
+## Edit a frame
+
+Each frame is one typeface. Append to `frames` in `static/data.json`.
+
+```jsonc
+{
+  "role": "Interface",                    // the job; must be unique across frames
+  "name": "Fira Sans",                    // must match the first family in `stack`
+  "weights": "100–900 · variable",
+  "sample": "Aa",                         // the large glyphs
+  "specimen": "Frames · Essays · Sunlit", // the sample line, set in the face
+  "stack": "\"Fira Sans\", system-ui, sans-serif",
+  "weight": 500,
+  "why": "Drawn for small screen text.",  // one sentence
+  "used": "The top rail, labels, buttons."
+}
+```
+
+**The frame count is the face count.** Add a font, add a frame. Remove a font, remove its
+frame. `check.mjs` enforces that `name` agrees with `stack`, and that the family is actually
+requested by the fonts link in `layouts/partials/head.html`.
+
+To add a face: add it to that fonts link, then add the frame.
+
+## Edit a link
+
+```jsonc
+{
+  "title": "Bluesky",
+  "url": "https://bsky.app/profile/HANDLE",  // absolute, https
+  "handle": "@handle",
+  "desc": "Short things, posted while walking."
+}
+```
+
+The domain label and the favicon are derived from `url`.
+
+## Post an essay
 
 ```bash
 npm run new -- posts/my-post.md
 ```
 
-Then edit the file and delete `draft: true`. Front matter:
+Then remove `draft: true`. Front matter:
 
 ```yaml
 ---
 title: "On gutter joints"
 date: 2026-07-02
-description: "One line. Used as the standfirst, the index summary, and the link preview."
-seed: 102          # picks the generated plate; MUST be unique
-growth: 0.5        # 0–1, how overgrown the plate is
-caption: "Gutter detail, 2024. Where it starts."
+description: "One line. Standfirst, index summary, and link preview."
+seed: 102          # picks the generated plate; MUST be unique among essays
+caption: "Gutter detail, 2024."
 # image: "/images/foo.jpg"   # optional; replaces the generated plate
 ---
 ```
 
-Body is ordinary Markdown. `##` headings, links, lists, blockquotes, tables, fenced code
-and raw HTML all render, and are styled by `.prose` in `static/styles.css`.
+## Invariants
 
-Publishing is `git push`. There is no draft server and no CMS.
-
-## Editing the sheet
-
-Append to `items` in `static/data.json`. `kind` decides how the window is drawn and which
-fields are required.
-
-```jsonc
-{
-  "kind": "plate",          // "plate" | "spec" | "note"
-  "stage": "encroaching",   // "bare" | "encroaching" | "consumed"
-  "growth": 0.5,            // 0 = bare concrete, 1 = buried
-  "title": "North Wall",
-  "year": "2024",
-  "medium": "Silver gelatin",
-  "subject": "The shaded face",   // plate: lightbox meta line
-  "seed": 37,                     // plate: picks the composition
-  "note": "Optional italic aside, lightbox only."
-}
-```
-
-| `kind` | Window shows | Required beyond the common fields |
-| --- | --- | --- |
-| `plate` | A generated concrete photograph | `seed` |
-| `spec` | A type specimen | `sample`, `stack`, `specimen` (optional `weight`) |
-| `note` | A text card | `body` |
-
-Outbound links go in `links` and render as preview cards under the sheet:
-
-```jsonc
-{
-  "title": "Bluesky",
-  "url": "https://bsky.app/profile/HANDLE",   // absolute, must be https
-  "handle": "@handle",
-  "desc": "Short things, posted while walking.",
-  "growth": 0.3,
-  "seed": 65
-}
-```
-
-## Invariants — these break the page if violated
-
-1. **`stage` must agree with `growth`.** Bands: `bare` ≤ 0.34, `encroaching` 0.34–0.67,
-   `consumed` > 0.67. Otherwise the badge contradicts the moss. Enforced by `check.mjs`.
-2. **`growth` is 0–1** on both frames and essays.
-3. **Every plate `seed` must be unique — across frames *and* essays.** They share one
-   generator, so a repeated seed puts the same photograph on two pages. `check.mjs` warns.
-4. **Filter `id`s must match a `kind` or a `stage`** of at least one frame, or the button
-   reads `00` and the sheet comes up empty. `all` is special.
-5. **Link `url`s must be absolute `https://`.** The hostname is parsed from it for the
-   domain label and the favicon lookup.
-6. **`public/` is generated.** Edit `static/`, `layouts/`, `content/`, then rebuild.
-7. **Plates are drawn, not stored.** `plateSVG()` in `app.js` generates them from a seed;
-   the same function runs at build time for essays via `[data-plate-seed]`. Do not add
-   image files for plates.
-8. **Colours come from CSS custom properties**, including inside generated SVG. Never
-   hard-code a hex in a plate or a vine — both appearances must keep working.
-9. **`llms.txt` is generated by `layouts/index.llms.txt`** from `data.json` and the essays.
-   Never hand-write it; it cannot drift if you leave it alone.
-10. **Every `id` that `app.js` looks up must exist in some template** under `layouts/`.
-    `check.mjs` enforces this, because a renamed id fails silently in the browser.
+1. **Moss grows in the joints, not on the faces.** Moss is clipped to the slab it belongs to
+   and lives in that slab's own bottom padding. It must never be a `position: fixed` layer and
+   must never sit under text. This is the change that fixed the site; see `DESIGN.md`.
+2. **Green is a field or an accent, never a layer.** Green is the Moonlit background, and the
+   link and focus colour. Nothing green goes on top of content.
+3. **Every plate `seed` must be unique among essays**, or two posts show the same image.
+4. **A frame's `name` must match the first family in its `stack`**, and that family must be in
+   the fonts link. Enforced.
+5. **Each frame `role` must be unique.** Two faces cannot share a job.
+6. **Link `url`s must be absolute `https://`.**
+7. **`public/` is generated.** Edit `static/`, `layouts/`, `content/`, then rebuild.
+8. **Plates are drawn, not stored.** `plateSVG(seed)` generates them from the seed; the same
+   function runs for essays via `[data-plate-seed]`. Do not add image files for plates.
+9. **Colours come from CSS custom properties**, including inside generated SVG. Never
+   hard-code a hex in a plate.
+10. **Both themes must define every token.** `[data-theme="dark"]` and `[data-theme="light"]`.
+11. **`llms.txt` is generated** by `layouts/index.llms.txt`. Never hand-write it.
+12. **Every `id` that `app.js` looks up must exist in some template** under `layouts/`.
+    Enforced, because a renamed id fails silently in the browser.
 
 ## Do not
 
-- **Do not publish the Obsidian vault here.** There is a separate digital garden for that.
-  This rule stands. There is exactly one recorded exception: three published vault notes
-  were imported once, as a test, with the owner's explicit approval.
+- **Do not publish the Obsidian vault here.** There is a separate digital garden. This rule
+  stands. There is exactly one recorded exception: three published notes were imported once,
+  as a test, with the owner's explicit approval.
   - `content/_index.md` — from *What is Typocasual?*, the vault's home note
   - `content/posts/hands.md` — from *hands*
   - `content/posts/typocasual-title.md` — from *typocasual title*
 
-  Do not extend this. Do not sync further notes, do not import drafts, and do not import
-  anything from the inbox. Ask the owner before you add any other vault content. Everything
-  else on the sheet and in `content/posts/` is placeholder material written for this site.
+  Do not extend this. Do not import drafts or inbox notes. Ask before adding anything else.
 - **Do not put the owner's resume, employment history, or personal records here.**
-- **Do not write a second copy of the rail, footer, or moss overlay** into a page template.
-  They are partials.
-- **Do not change a colour in only one theme.** Both `[data-theme="dark"]` (Moonlit) and
-  `[data-theme="light"]` (Sunlit) must define every token.
-- **Do not remove the red squiggle** under the wordmark. *typocasual* is a deliberate
-  misspelling and the squiggle is the brand mark.
+- **Do not bring back the overgrowth layer.** `DESIGN.md` has the measurement showing why it
+  was removed. A full-viewport moss overlay is the specific thing that buried the links.
+- **Do not enlarge the wordmark.** It ran at 160px and filled the viewport. Keep it at or
+  below the current `clamp(2.4rem, 7vw, 4.6rem)`.
+- **Do not add subtitles under the title.** There were four stacked lines; one remains.
+- **Do not correct the spelling of `typocasual`.** The red squiggle under it is the brand mark.
+- **Do not duplicate the rail, footer or sprig** into a page template. They are partials.
 
 ## Design system
 
-Palette and type come from the **Typocasual Forest** system. Its canonical source is a file
-in the owner's Obsidian vault, not in this repo:
+Palette and type come from the **Typocasual Forest** system. Its canonical source is in the
+owner's Obsidian vault, not in this repo:
 
 ```
 99 System/Design System/Typocasual Forest/tokens.json
 ```
 
 `static/styles.css` consumes those tokens as CSS custom properties and extends them with
-concrete greys and the signature red (`#ff382c`) from the wordmark. If the vault tokens
-change, update the token block at the top of `styles.css` by hand — nothing here reaches
-into the vault.
+concrete greys and the signature red (`#ff382c`). Nothing here reaches into the vault; if the
+vault tokens change, update the token block by hand.
 
-| Role | Typeface |
+| Face | Job |
 | --- | --- |
-| Logotype | Epilogue 900 |
-| Headings, essay titles, blockquotes | Lora |
-| Reading (`.prose`, body) | Atkinson Hyperlegible Next |
-| Captions, frame numbers, interface | Atkinson Hyperlegible Mono |
+| Epilogue | Display — the logotype |
+| Fira Sans | Interface — rail, labels, buttons |
+| Lora | Headings — page and essay titles, blockquotes |
+| Lexend Deca | Standfirst — the line under a title |
+| Atkinson Hyperlegible Next | Reading — all body copy |
+| Atkinson Hyperlegible Mono | Data — captions, dates, frame numbers, code |
 
-Long-form reading follows the Forest spec: 17px, line-height 1.7, held under 70ch on an
-opaque low-glare ground.
+Reading is 17px at line-height 1.7, in a column under 68 characters.
 
-## Accessibility requirements
+## Environment notes
 
-Do not regress these:
-
-- `prefers-reduced-motion: reduce` stops the vines swaying, the spores drifting, and the
-  squiggle drawing itself in.
-- Interactive controls are at least 40px.
-- The lightbox traps focus, closes on `Escape`, and steps with arrow keys.
-- The sheet is keyboard navigable from the skip link onward.
-- Every frame's trigger button has a descriptive `aria-label`.
+- **The session model has no vision.** `PI_MODEL` is a text-only DeepSeek, so pasted images
+  are stripped. Use `auge --all <image>` (Apple Vision CLI, installed) for image analysis.
+  Delegating to a vision model does not work: subagents receive no file-reading tools here.
+- **`auge`** wraps Apple Vision: `--ocr`, `--classify`, `--document`, `--saliency-attention`,
+  `--aesthetics`, `--layout`, and `--all`.
 
 ## Verifying a change
 
 1. `npm run check` — must pass, no new warnings.
 2. `npm run dev`, then confirm:
-   - `/` shows the sheet; the frame count in the rail and colophon match `data.json`
-   - each filter shows its own count, and none is empty
-   - clicking a frame opens the lightbox; arrow keys step through the *filtered* set
+   - `/` shows six frames, each with a live specimen in the correct face
    - `/posts/` lists the essays, newest first
-   - an essay page shows its plate, title, date and body, with the image column sticky on
-     a wide window and stacked on a narrow one
+   - an essay page shows its plate, title, date and body, with the image column sticky on a
+     wide window and stacked on a narrow one
    - `/llms.txt` mentions the essay you just added
    - the theme toggle flips both appearances without unreadable text
+   - **no green shape covers any text** at any width
 3. Check a narrow window (~390px) for horizontal overflow.
-4. Commit and push. CI validates, builds, and deploys.
+4. Append an entry to `LEDGER.md` if the change was substantial.
+5. Commit and push. CI validates, builds, and deploys.

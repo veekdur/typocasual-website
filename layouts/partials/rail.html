@@ -1,25 +1,21 @@
 <div class="rail">
-  <a class="rail__cell rail__cell--link" href="/">typocasual</a>
+  <div class="rail__inner">
+    <a class="rail__cell rail__cell--link" href="/">typocasual</a>
 
-  <span class="rail__cell">
-    {{- if .IsHome }}Contact sheet
-    {{- else if .IsPage }}Essay
-    {{- else }}Essays{{ end -}}
-  </span>
+    <span class="rail__cell rail__cell--now">
+      {{- if .IsHome }}The type
+      {{- else if .IsPage }}Essay
+      {{- else }}Essays{{ end -}}
+    </span>
 
-  {{- if .IsHome }}
-    <span class="rail__cell rail__cell--hide">Frames&nbsp;<b id="frame-count">—</b></span>
-  {{- else if .IsPage }}
-    <span class="rail__cell rail__cell--hide">{{ .Date.Format "02.01.2006" }}</span>
-  {{- end }}
+    {{- if not .IsHome }}
+      <a class="rail__cell rail__cell--link" href="/">Front page</a>
+    {{- end }}
 
-  {{- if .IsHome }}
-    <a class="rail__cell rail__cell--link" href="/posts/">Essays</a>
-  {{- else }}
-    <a class="rail__cell rail__cell--link" href="/">The sheet</a>
-  {{- end }}
+    <span class="rail__spacer"></span>
 
-  <button class="rail__cell rail__cell--btn" id="theme-toggle" type="button" aria-live="polite">
-    <span class="dot" aria-hidden="true"></span><span id="theme-label">Moonlit</span>
-  </button>
+    <button class="rail__cell rail__cell--btn" id="theme-toggle" type="button" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span><span id="theme-label">Moonlit</span>
+    </button>
+  </div>
 </div>
